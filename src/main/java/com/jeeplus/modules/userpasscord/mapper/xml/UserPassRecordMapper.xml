@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.userpasscord.mapper.UserPassRecordMapper">
+    
+	<sql id="userPassRecordColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.personnel_id AS "personnelId",
+		a.name AS "name",
+		a.sex AS "sex",
+-- 		a.state AS "state",
+		a.card_serial AS "cardSerial",
+		a.dept_name AS "deptName",
+		a.pass_time AS "passTime",
+		a.pass_station AS "passStation",
+		a.pass_type AS "passType"
+	</sql>
+	
+	<sql id="userPassRecordJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="UserPassRecord" >
+		SELECT 
+			<include refid="userPassRecordColumns"/>
+		FROM user_pass_record a
+		<include refid="userPassRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserPassRecord" >
+		SELECT 
+			<include refid="userPassRecordColumns"/>
+		FROM user_pass_record a
+		<include refid="userPassRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="personnelId != null and personnelId != ''">
+				AND a.personnel_id like #{personnelId}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name like #{name}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="cardSerial != null and cardSerial != ''">
+				AND a.card_serial like #{cardSerial}
+			</if>
+			<if test="beginpassTime != null and beginpassTime != '' and endpassTime != null and endpassTime != ''">
+				AND a.pass_time BETWEEN #{beginpassTime} AND #{endpassTime}
+			</if>
+			<if test="beginpassTime != null and beginpassTime != ''">
+				AND a.pass_time &gt;= #{beginpassTime}
+			</if>
+			<if test="endpassTime != null and endpassTime != ''">
+				AND a.pass_time &lt;= #{endpassTime}
+			</if>
+			<if test="passStation != null and passStation != ''">
+				AND a.pass_station = #{passStation}
+			</if>
+			<if test="passType != null and passType != ''">
+				AND a.pass_type = #{passType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserPassRecord" >
+		SELECT 
+			<include refid="userPassRecordColumns"/>
+		FROM user_pass_record a
+		<include refid="userPassRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_pass_record(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			personnel_id,
+			name,
+			sex,
+			card_serial,
+			dept_name,
+			pass_time,
+			pass_station,
+			pass_type
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{personnelId},
+			#{name},
+			#{sex},
+			#{cardSerial},
+			#{deptName},
+			#{passTime},
+			#{passStation},
+			#{passType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_pass_record SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			personnel_id = #{personnelId},
+			name = #{name},
+			sex = #{sex},
+			card_serial = #{cardSerial},
+			dept_name = #{deptName},
+			pass_time = #{passTime},
+			pass_station = #{passStation},
+			pass_type = #{passType}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM user_pass_record
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE user_pass_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="UserPassRecord" statementType="STATEMENT">
+		select * FROM user_pass_record  where ${propertyName} = '${value}'
+	</select>
+
+	<select id="findInfoByCard" resultType="UserPassRecord">
+		SELECT
+		p.personnel_id personnelId,
+		p.name,
+		p.sex,
+		p.state,
+		p.dept_name deptName FROM user_pass_info p
+		WHERE
+		p.card_serial = #{cardSerial}
+		and p.state=0
+	</select>
+
+	<insert id="saveUserPassInfo">
+		INSERT INTO user_pass_info(
+			id,
+			personnel_id,
+			name,
+			state,
+			sex,
+			card_serial,
+			dept_name
+		) VALUES (
+			#{id},
+			#{personnelId},
+			#{name},
+			#{state},
+			#{sex},
+			#{cardSerial},
+			#{deptName}
+		)
+	</insert>
+
+	<update id="deleteUserPassInfo">
+		delete from user_pass_info
+	</update>
+<!--	进门人员-->
+	<select id="getUserInCounts" resultType="int">
+		SELECT count(DISTINCT(r.pass_time)) FROM `user_pass_record` r where r.pass_time BETWEEN #{beginpassTime} AND #{endpassTime}
+		and r.pass_station != '10.12.240.139'
+	</select>
+<!--	出门人员-->
+	<select id="getUserOutCounts" resultType="int">
+		SELECT count(DISTINCT(r.pass_time)) FROM `user_pass_record` r where r.pass_time BETWEEN #{beginpassTime} AND #{endpassTime}
+		and r.pass_station = '10.12.240.139'
+	</select>
+<!--	预约人员-->
+	<select id="getConsignUser" resultType="int">
+		SELECT count(DISTINCT(r.pass_time)) FROM `user_pass_record` r where r.personnel_id IS NULL AND pass_time
+		BETWEEN #{beginpassTime} and #{endpassTime}
+		and pass_station in ('10.12.241.106','10.12.240.129','10.12.240.144')
+	</select>
+<!--	预约入厂人员-->
+	<select id="getIntoUserList" resultType="int">
+		SELECT count(DISTINCT(r.pass_time)) FROM `user_pass_record` r where r.personnel_id IS NULL AND pass_time
+		BETWEEN #{beginpassTime} and #{endpassTime}
+		and pass_station in ('10.12.240.129','10.12.240.144')
+	</select>
+</mapper>

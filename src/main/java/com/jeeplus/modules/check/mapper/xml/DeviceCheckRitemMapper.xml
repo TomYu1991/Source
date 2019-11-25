@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.check.mapper.DeviceCheckRitemMapper">
+    
+	<sql id="deviceCheckRitemColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.remarks as "remarks",
+		a.record_id AS "recordId",
+		a.device_name AS "deviceName",
+		a.check_item AS "checkItem",
+		a.check_content AS "checkContent",
+		a.check_reference AS "checkReference",
+		a.check_method as "checkMethod",
+		a.check_result as "checkResult",
+		a.device_state	as "deviceState"
+	</sql>
+	
+	<sql id="deviceCheckJoins">
+
+
+	</sql>
+	
+    
+	<select id="get" resultType="deviceCheckRitem" >
+		SELECT 
+			<include refid="deviceCheckRitemColumns"/>
+		FROM device_check_ritem a
+
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="deviceCheckRitem" >
+		SELECT 
+			<include refid="deviceCheckRitemColumns"/>
+		FROM device_check_ritem a
+
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="deviceName != null and deviceName != ''">
+				AND a.device_name = #{deviceName}
+			</if>
+			<if test="checkMethod != null and checkMethod != ''">
+				AND a.check_method = #{checkMethod}
+			</if>
+
+			<if test="recordId != null and recordId != ''">
+				AND a.record_id = #{recordId}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.device_name asc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="deviceCheckRitem" >
+		SELECT 
+			<include refid="deviceCheckRitemColumns"/>
+		FROM device_check_ritem a
+		<include refid="deviceCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.device_name asc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO device_check_ritem(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			remarks,
+			record_id,
+			device_name,
+			check_item,
+			check_content,
+			check_reference,
+			check_method,
+			check_result,
+			device_state
+		) VALUES (
+
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{remarks},
+			#{recordId},
+			#{deviceName},
+			#{checkItem},
+			#{checkContent},
+			#{checkReference},
+			#{checkMethod},
+			#{checkResult},
+			#{deviceState}
+		)
+	</insert>
+
+
+	<update id="update">
+		UPDATE device_check_ritem SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			check_method = #{checkMethod},
+			check_result = #{checkResult}
+
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM device_check_ritem
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE device_check_ritem SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+
+</mapper>

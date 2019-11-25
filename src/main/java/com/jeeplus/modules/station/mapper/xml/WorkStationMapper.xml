@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.station.mapper.WorkStationMapper">
+    
+	<sql id="workStationColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.work_station AS "workStation",
+		a.location AS "location",
+		a.type AS "type",
+		a.pass_code_in AS "inPassCode",
+		a.pass_code_out AS "outPassCode",
+		a.remarks AS "remarks",
+		a.station_ip AS "stationIp"
+	</sql>
+	
+	<sql id="workStationJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="WorkStation" >
+		SELECT 
+			<include refid="workStationColumns"/>
+		FROM work_station a
+		<include refid="workStationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WorkStation" >
+		SELECT 
+			<include refid="workStationColumns"/>
+		FROM work_station a
+		<include refid="workStationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="workStation != null and workStation != ''">
+				AND a.work_station = #{workStation}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.work_station
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WorkStation" >
+		SELECT 
+			<include refid="workStationColumns"/>
+		FROM work_station a
+		<include refid="workStationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO work_station(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			work_station,
+			location,
+			type,
+			pass_code_in,
+			pass_code_out,
+			remarks,
+            station_ip
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{workStation},
+			#{location},
+			#{type},
+			#{inPassCode},
+			#{outPassCode},
+			#{remarks},
+			#{stationIp}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE work_station SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			work_station = #{workStation},
+			location = #{location},
+			type = #{type},
+			pass_code_in = #{inPassCode},
+			pass_code_out =#{outPassCode},
+			remarks = #{remarks},
+			station_ip = #{stationIp}
+		WHERE id = #{id}
+	</update>
+	
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM work_station
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE work_station SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="WorkStation" statementType="STATEMENT">
+		select * FROM work_station  where ${propertyName} = '${value}'
+	</select>
+
+
+	<select id="queryDeviceNoSBCH" resultType="WorkStation" >
+		select
+		 s.device_num deviceNo
+		 from
+		 station_device s LEFT JOIN  work_station w
+		 on
+		 w.id = s.station_id
+		 where
+		 s.device_type = '7'
+		 and
+		 w.type = '3';
+	</select>
+
+	<select id="queryDeviceNoRFID" resultType="WorkStation" >
+		select
+		s.device_num deviceNo
+		from
+		station_device s
+		LEFT JOIN
+		work_station w
+		on
+		w.id = s.station_id
+		where
+		s.device_type = '9'
+		and
+		w.type = '3';
+	</select>
+
+	<!-- 通过设备编号获取工作站信息-->
+	<select id="queryByDeviceNo" resultType="WorkStation">
+		SELECT
+		<include refid="workStationColumns"/>
+		FROM
+		work_station a,station_device s
+		where  a.id = s.station_id
+    and s.device_num = #{deviceNo}
+	</select>
+
+	<!-- 通过工作站获取工作站名称-->
+	<select id="queryWorkNameByStationIp" resultType="WorkStation">
+		SELECT
+        a.work_station AS "workStation"
+		FROM
+		work_station a
+		where a.station_ip = #{stationIp}
+	</select>
+
+	<!-- 通过ip获取工作站-->
+	<select id="queryByStationIp" resultType="WorkStation">
+		SELECT
+		<include refid="workStationColumns"/>
+		FROM
+		work_station a
+		where a.station_ip = #{stationIp}
+	</select>
+
+    <!-- 通过名称获取工作站-->
+    <select id="queryByStationName" resultType="WorkStation">
+        SELECT
+        <include refid="workStationColumns"/>
+        FROM
+        work_station a
+        where a.work_station like  #{workStation}
+
+    </select>
+</mapper>

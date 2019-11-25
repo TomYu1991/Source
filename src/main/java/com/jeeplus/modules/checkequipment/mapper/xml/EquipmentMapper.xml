@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.checkequipment.mapper.EquipmentMapper">
+    
+	<sql id="equipmentColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.device_station AS "station.id",
+		a.equipment AS "equipment",
+		a.check_method AS "checkMethod",
+		a.mainten_explanation AS "maintenExplanation",
+		a.equipment_type AS "equipmentType",
+		station.work_station AS "station.workStation"
+	</sql>
+	
+	<sql id="equipmentJoins">
+		
+		LEFT JOIN work_station station ON station.id = a.device_station
+	</sql>
+	
+    
+	<select id="get" resultType="Equipment" >
+		SELECT 
+			<include refid="equipmentColumns"/>
+		FROM check_equipment a
+		<include refid="equipmentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Equipment" >
+		SELECT 
+			<include refid="equipmentColumns"/>
+		FROM check_equipment a
+		<include refid="equipmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="station != null and station.id != null and station.id != ''">
+				AND a.device_station = #{station.id}
+			</if>
+			<if test="equipment != null and equipment != ''">
+				AND a.equipment = #{equipment}
+			</if>
+			<if test="equipmentType != null and equipmentType != ''">
+				AND a.equipment_type = #{equipmentType}
+			</if>
+			<if test="checkMethod != null and checkMethod != ''">
+				AND a.check_method = #{checkMethod}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Equipment" >
+		SELECT 
+			<include refid="equipmentColumns"/>
+		FROM check_equipment a
+		<include refid="equipmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO check_equipment(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			device_station,
+			equipment,
+			check_method,
+			mainten_explanation,
+			equipment_type
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{station.id},
+			#{equipment},
+			#{checkMethod},
+			#{maintenExplanation},
+			#{equipmentType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE check_equipment SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			device_station = #{station.id},
+			equipment = #{equipment},
+			check_method = #{checkMethod},
+			mainten_explanation = #{maintenExplanation},
+			equipment_type = #{equipmentType}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM check_equipment
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE check_equipment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Equipment" statementType="STATEMENT">
+		select
+		*
+		FROM
+		check_equipment
+		where
+		${propertyName} = '${value}'
+	</select>
+    <!-- 根据工作站名称和设备名称查询设备名称是否唯一-->
+	<select id="findEquipmentUnique" resultType="Equipment">
+		SELECT
+		 c.equipment equipment
+		 FROM
+		 check_equipment c,work_station w
+		 WHERE c.device_station = w.id
+		 AND c.equipment = #{equipment}
+		 AND w.work_station = #{station}
+	</select>
+</mapper>

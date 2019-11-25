@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.changeDatabase.mapper.ChangeDatabaseMapper">
+
+	<!-- 查询网络状态 -->
+	<select id="queryNetStatus" resultType="ChangeDatabase" >
+		SELECT
+			a.value netStatus
+		FROM
+		sys_dict_value a
+		left join sys_dict_type t on t.id = a.dict_type_id
+		where t.type = "net_status"
+	</select>
+
+	<!--修改网络状态-->
+	<update id="updateNetStatus">
+		update sys_dict_value a set a.value = #{netStatus}
+		WHERE id = "6621ec45f25f42dbabb52b3a0b0b9678"
+	</update>
+</mapper>

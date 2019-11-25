@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.check.mapper.DeviceCheckRecordMapper">
+    
+	<sql id="deviceCheckRecordColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.working_group AS "workingGroup",
+		a.working_area AS "workingArea",
+		a.group_leader AS "groupLeader",
+		a.group_worker AS "groupWorker",
+		a.check_cycle AS "checkCycle",
+		a.check_date as "checkDate",
+		a.remarks as "remarks",
+		a.config_id as "configId",
+		a.is_finished as "isFinished",
+		a.is_aborted as "isAborted"
+	</sql>
+	
+	<sql id="deviceCheckJoins">
+
+
+	</sql>
+	
+    
+	<select id="get" resultType="deviceCheckRecord" >
+		SELECT 
+			<include refid="deviceCheckRecordColumns"/>
+		FROM device_check_record a
+
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="deviceCheckRecord" >
+		SELECT 
+			<include refid="deviceCheckRecordColumns"/>
+		FROM device_check_record a
+
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.is_finished ='0'
+			${dataScope}
+			<if test="workingGroup != null and workingGroup != ''">
+				AND a.working_group = #{workingGroup}
+			</if>
+			<if test="workingArea != null and workingArea != ''">
+				AND a.working_area = #{workingArea}
+			</if>
+			<if test="groupLeader != null and groupLeader != ''">
+				AND a.group_leader = #{groupLeader}
+			</if>
+			<if test="groupWorker != null and groupWorker != ''">
+				AND a.group_worker = #{groupWorker}
+			</if>
+			<if test="checkCycle != null and checkCycle != ''">
+				AND a.check_cycle = #{checkCycle}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC,a.working_group asc , a.working_area asc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="deviceCheckRecord" >
+		SELECT 
+			<include refid="deviceCheckRecordColumns"/>
+		FROM device_check_record a
+		<include refid="deviceCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC,a.working_group asc , a.working_area asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findTaskList2" resultType="java.util.HashMap" >
+		SELECT
+		a1.id AS "id",
+		a1.working_group AS "workingGroup",
+		a1.working_area AS "workingArea",
+		a1.group_leader AS "groupLeader",
+		a1.group_worker AS "groupWorker",
+		a1.check_cycle AS "checkCycle",
+		a1.check_date as "checkDate",
+		a1.remarks as "remarks",
+		a2.id AS "itemid",
+		a2.remarks as "itemremarks",
+		a2.device_name AS "deviceName",
+		a2.check_item AS "checkItem",
+		a2.check_content AS "checkContent",
+		a2.check_reference AS "checkReference",
+		a2.check_method as "checkMethod",
+		a2.check_result as "checkResult",
+		a2.device_state as "deviceState"
+		from device_check_config a1 LEFT JOIN device_check_citem a2 on a1.id = a2.config_id
+
+		<where>
+
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			and a1.is_enable = '1'
+			and a1.id not in (SELECT config_id  from device_check_record where
+			<if test="tasktime == null ">
+				substring(create_date, 1, 10) = date_format(NOW(), '%Y-%c-%d' ) )
+			</if>
+			<if test="checkCycle != null and checkCycle != ''">
+				substring(create_date, 1, 10) = date_format(NOW(), '%Y-%c-%d' ) )
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.working_group asc , a.working_area asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findTaskList" parameterType="Map"  resultType="java.util.LinkedHashMap" >
+		SELECT
+		a1.id AS "id",
+		a1.working_group AS "workingGroup",
+		a1.working_area AS "workingArea",
+		a1.group_leader AS "groupLeader",
+		a1.group_worker AS "groupWorker",
+		a1.check_cycle AS "checkCycle",
+		a1.check_date as "checkDate",
+		a1.remarks as "remarks",
+		a2.id AS "itemid",
+		a2.remarks as "itemremarks",
+		a2.device_name AS "deviceName",
+		a2.check_item AS "checkItem",
+		a2.check_content AS "checkContent",
+		a2.check_reference AS "checkReference",
+		a2.check_method as "checkMethod",
+		a2.check_result as "checkResult",
+		a2.device_state as "deviceState"
+		from device_check_config a1 LEFT JOIN device_check_citem a2 on a1.id = a2.config_id
+
+		<where>
+
+			a1.del_flag = '0'
+			and a1.is_enable = '1'
+			and a1.id not in (SELECT config_id  from device_check_record where
+			<if test="tasktime == null or tasktime == ''">
+				substring(create_date, 1, 10) = date_format(NOW(), '%Y-%c-%d' ) )
+			</if>
+			<if test="tasktime != null and tasktime != ''">
+				substring(create_date, 1, 10) = #{tasktime} )
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a1.working_group asc , a1.working_area asc
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+	
+	<insert id="insert">
+<!--		<selectKey keyProperty="id" resultType="DeviceCheckRecord" order="BEFORE">-->
+<!--			SELECT UUID()-->
+<!--		</selectKey>-->
+		INSERT INTO device_check_record(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			remarks,
+			working_group,
+			working_area,
+			group_leader,
+			group_worker,
+			check_cycle,
+			check_date,
+			config_id
+		) VALUES (
+
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{remarks},
+			#{workingGroup},
+			#{workingArea},
+			#{groupLeader},
+			#{groupWorker},
+			#{checkCycle},
+			#{checkDate},
+			#{configId}
+		)
+	</insert>
+
+
+	<update id="update">
+		UPDATE device_check_record SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateCancel">
+		update device_check_record set
+		update_date=#{updateDate},
+		group_worker=#{groupWorker},
+		is_finished=#{isFinished},
+		is_aborted=#{isAborted},
+		remarks=#{remarks}
+		where id=#{id}
+	</update>
+
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM device_check_record
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE device_check_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="finish">
+		update device_check_record
+		set
+		working_group=#{workingGroup},
+		group_leader=#{groupLeader},
+		group_worker = #{groupWorker},
+		is_finished = #{isFinished},
+		update_date = #{updateDate}
+		where id = #{id}
+	</update>
+
+	<resultMap id="reportMap" type="DeviceCheckRecord">
+		<id column="id" property="id"/>
+		<result column="create_date" property="createDate"/>
+		<result column="update_date" property="updateDate"/>
+		<result column="working_group" property="workingGroup"/>
+		<result column="working_area" property="workingArea"/>
+		<result column="group_leader" property="groupLeader"/>
+		<result column="group_worker" property="groupWorker"/>
+		<result column="check_date" property="checkDate"/>
+		<result column="check_cycle" property="checkCycle"/>
+		<result column="is_aborted" property="isAborted"/>
+		<result column="record_remarks" property="remarks"/>
+		<collection ofType="DeviceCheckRitem" property="deviceCheckRitemList">
+			<id column="item_id" property="id"/>
+			<result column="device_name" property="deviceName"/>
+			<result column="check_item" property="checkItem"/>
+			<result column="check_content" property="checkContent"/>
+			<result column="check_reference" property="checkReference"/>
+			<result column="check_result" property="checkResult"/>
+			<result column="check_method" property="checkMethod"/>
+			<result column="remarks" property="remarks"/>
+		</collection>
+	</resultMap>
+	<select id="getReportList" resultMap="reportMap">
+		select
+		a.id,
+		a.create_by,
+		a.create_date,
+		a.update_by,
+		a.update_date,
+		a.del_flag,
+		a.working_group,
+		a.working_area,
+		a.group_leader,
+		a.group_worker,
+		a.check_cycle,
+		a.check_date,
+		a.is_finished,
+		a.is_aborted,
+		a.remarks as record_remarks,
+		b.id as item_id,
+		b.remarks,
+		b.record_id,
+		b.device_name,
+		b.check_item,
+		b.check_content,
+		b.check_reference,
+		b.check_method,
+		b.check_result,
+		b.remarks
+		from
+		device_check_record a
+		left join
+		device_check_ritem b
+		on a.id=b.record_id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.is_finished ='1'
+			${dataScope}
+			<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+				AND a.update_date BETWEEN #{startTime} AND #{endTime}
+			</if>
+<!--			<if test="startTime != null and startTime != ''">-->
+<!--				AND a.update_date &gt;= #{startTime}-->
+<!--			</if>-->
+<!--			<if test="endTime != null and endTime != ''">-->
+<!--				AND a.update_date &lt;= #{endTime}-->
+<!--			</if>-->
+		</where>
+	</select>
+
+	<select id="findFinishedList" resultType="DeviceCheckRecord">
+		SELECT
+		<include refid="deviceCheckRecordColumns"/>
+		FROM device_check_record a
+
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.is_finished ='1'
+			${dataScope}
+			<if test="workingGroup != null and workingGroup != ''">
+				AND a.working_group = #{workingGroup}
+			</if>
+			<if test="workingArea != null and workingArea != ''">
+				AND a.working_area = #{workingArea}
+			</if>
+			<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+				AND a.update_date BETWEEN #{startTime} AND #{endTime}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.update_date &gt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.update_date &lt;= #{endTime}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC,a.working_group asc , a.working_area asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<update id="updateEdit" parameterType="DeviceCheckRecord">
+		update device_check_record set
+		update_date=#{updateDate},
+		group_leader=#{groupLeader},
+		working_area=#{workingArea},
+		working_group=#{workingGroup}
+		where id=#{id}
+	</update>
+
+	<update id="cancel" parameterType="DeviceCheckRecord">
+		update device_check_record set
+		is_finished='0'
+		where id=#{id}
+	</update>
+</mapper>

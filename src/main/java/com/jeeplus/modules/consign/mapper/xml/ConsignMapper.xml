@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.consign.mapper.ConsignMapper">
+    
+	<sql id="consignColumns">
+		a.id AS "id",
+		a.del_flag AS "delFlag",
+		a.bill_type AS "type",
+		a.consign_no AS "consignNo",
+		a.consign_id AS "consignId",
+		a.consign_user AS "consignUser",
+		a.consign_dept AS "consignDept",
+		a.weight_type AS "weightType",
+		a.equip_num AS "equipNum",
+		a.prod_code AS "prodCode",
+		a.prod_cname AS "prodCname",
+		a.sg_code AS "sgCode",
+		a.sg_sign AS "sgSign",
+		a.mat_spec_desc AS "matSpecDesc",
+		a.bill_no AS "billNo",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.surplus_wt AS "surplusWt",
+		a.total_wt AS "totalWt",
+		a.supplier_name AS "supplierName",
+		a.consigne_user AS "consigneUser",
+		a.content AS "content",
+		a.deal_person_no AS "dealPersonNo",
+		a.deal_dept AS "dealDept",
+		a.tel_num AS "telNum",
+		a.vehicle_no AS "vehicleNo",
+		a.user_name AS "userName",
+		a.carry_company_name AS "carryCompanyName",
+		a.tel AS "tel",
+		a.pass_code AS "passCode",
+		a.blast_furnace_no AS "blastFurnaceNo",
+		a.ladle_no AS "ladleNo",
+		a.consign_state AS "consignState",
+		a.company_cname AS "companyCname",
+		a.trans_contact_person AS "transContactPerson",
+		a.id_card AS "IDCard",
+		a.trans_contact_person_tel AS "transContactPersonTel",
+		a.rfid_no AS "rfidNo",
+		a.data_type AS "dateType",
+		a.weight_state AS "weightState",
+		a.status AS "status",
+		a.data_sources AS "dataSources",
+		a.default_flag AS "defaultFlag",
+		a.ponder_flag AS "ponderFlag",
+		a.more_rate AS "moreRate",
+		a.code_flag AS "codeFlag",
+		a.field1 AS "field1",
+		a.field2 AS "field2",
+		a.field3 AS "field3",
+		a.field4 AS "field4",
+		a.field5 AS "field5",
+		a.field_n1 AS "fieldN1",
+		a.field_n2 AS "fieldN2",
+		a.field_n3 AS "fieldN3"
+-- 		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="consignJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="Consign" >
+		SELECT 
+			<include refid="consignColumns"/>
+		FROM consign a
+		<include refid="consignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Consign" >
+		SELECT
+			<include refid="consignColumns"/>
+		FROM consign a
+		<include refid="consignJoins"/>
+		where   1=1
+			<if test="type != null and type != ''">
+				AND a.bill_type = #{type}
+			</if>
+			<if test="consignId != null and consignId != ''">
+				AND a.consign_id like #{consignId}
+			</if>
+		<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+			AND a.create_date BETWEEN #{startTime} AND #{endTime}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND a.create_date &gt;= #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND a.create_date &lt;= #{endTime}
+		</if>
+		<if test="prodCname != null and prodCname != ''">
+			AND a.prod_cname like #{prodCname}
+		</if>
+
+			<if test="totalWt != null and totalWt != ''">
+				AND a.surplus_wt >0
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no like #{vehicleNo}
+			</if>
+            <if test="status != null and status != ''">
+                AND a.status =#{status}
+            </if>
+		<if test="field2 != null and field2 != ''">
+			AND a.field2 =#{field2}
+		</if>
+		<if test="field1 != null and field1 != ''">
+			AND a.field1 =#{field1}
+		</if>
+		<if test="ponderFlag != null and ponderFlag != ''">
+			AND a.ponder_flag =#{ponderFlag}
+		</if>
+		<if test="IDCard != null and IDCard != ''">
+			AND a.id_card like #{IDCard}
+		</if>
+		<if test="weightState!= null and weightState!= ''and weightState == '1'.toString()">
+			AND a.weight_state = '1'
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Consign" >
+		SELECT 
+			<include refid="consignColumns"/>
+		FROM consign a
+		<include refid="consignJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO consign(
+			id,
+			bill_type,
+			consign_id,
+			consign_user,
+			consign_dept,
+			weight_type,
+			equip_num,
+			prod_code,
+			prod_cname,
+			sg_code,
+			sg_sign,
+			mat_spec_desc,
+			bill_no,
+			start_time,
+			end_time,
+			total_wt,
+			supplier_name,
+			consigne_user,
+			content,
+			deal_person_no,
+			deal_dept,
+			tel_num,
+			vehicle_no,
+			user_name,
+			carry_company_name,
+			tel,
+			pass_code,
+			blast_furnace_no,
+			ladle_no,
+			consign_state,
+			company_cname,
+			trans_contact_person,
+			id_card,
+			trans_contact_person_tel,
+			rfid_no,
+			data_type,
+			weight_state,
+			status,
+			data_sources，
+			default_flag,
+			ponder_flag,
+			more_rate ,
+			code_flag ,
+			field1,
+			field2,
+			field3,
+			field4,
+			field5,
+			field_n1,
+			field_n2,
+			field_n3,
+			remarks
+		) VALUES (
+			#{id},
+			#{type},
+			#{consignId},
+			#{consignUser},
+			#{consignDept},
+			#{weightType},
+			#{equipNum},
+			#{prodCode},
+			#{prodCname},
+			#{sgCode},
+			#{sgSign},
+			#{matSpecDesc},
+			#{billNo},
+			#{startTime},
+			#{endTime},
+			#{totalWt},
+			#{supplierName},
+			#{consigneUser},
+			#{content},
+			#{dealPersonNo},
+			#{dealDept},
+			#{telNum},
+			#{vehicleNo},
+			#{userName},
+			#{carryCompanyName},
+			#{tel},
+			#{passCode},
+			#{blastFurnaceNo},
+			#{ladleNo},
+			#{consignState},
+			#{companyCname},
+			#{transContactPerson},
+			#{IDCard},
+			#{transContactPersonTel},
+			#{rfidNo},
+			#{dataType},
+			#{weightState},
+			#{status},
+			#{dataSources},
+			#{defaultFlag},
+			#{ponderFlag},
+			#{moreRate},
+			#{codeFlag},
+			#{field1},
+			#{field2},
+			#{field3},
+			#{field4},
+			#{field5},
+			#{fieldN1},
+			#{fieldN2},
+			#{fieldN3},
+			#{remarks},
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE consign SET 	
+			bill_type = #{type},
+			consign_id = #{consignId},
+			consign_user = #{consignUser},
+			consign_dept = #{consignDept},
+			weight_type = #{weightType},
+			equip_num = #{equipNum},
+			prod_code = #{prodCode},
+			prod_cname = #{prodCname},
+			sg_code = #{sgCode},
+			sg_sign = #{sgSign},
+			mat_spec_desc = #{matSpecDesc},
+			bill_no = #{billNo},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			total_wt = #{totalWt},
+			supplier_name = #{supplierName},
+			consigne_user = #{consigneUser},
+			content = #{content},
+			deal_person_no = #{dealPersonNo},
+			deal_dept = #{dealDept},
+			tel_num = #{telNum},
+			vehicle_no = #{vehicleNo},
+			user_name = #{userName},
+			carry_company_name = #{carryCompanyName},
+			tel = #{tel},
+			pass_code = #{passCode},
+			blast_furnace_no = #{blastFurnaceNo},
+			ladle_no = #{ladleNo},
+			consign_state = #{consignState},
+			company_cname = #{companyCname},
+			trans_contact_person = #{transContactPerson},
+			id_card = #{IDCard},
+			trans_contact_person_tel = #{transContactPersonTel},
+			rfid_no = #{rfidNo},
+			data_type=#{dataType},
+			weight_state=#{weightState},
+			status=#{status},
+			data_sources=#{dataSources},
+			default_flag=#{defaultFlag},
+			ponder_flag=#{ponderFlag},
+			more_rate =#{moreRate},
+			code_flag =#{codeFlag},
+			field1=#{field1},
+			field2=#{field2},
+			field3=#{field3},
+			field4=#{field4},
+			field5=#{field5},
+			field_n1=#{fieldN1},
+			field_n2=#{fieldN2},
+			field_n3=#{fieldN3},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM consign
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="cancel">
+		UPDATE consign SET 
+			status = #{status}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Consign" statementType="STATEMENT">
+		select * FROM consign  where ${propertyName} = '${value}'
+	</select>
+
+	<!--根据车牌号和当前时间查询有效的委托/预约单-->
+	<select id="findConsignByVehicleNo" resultType="Consign">
+		select
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		a.status ='0'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			AND a.vehicle_no = #{vehicleNo}
+		</if>
+		<if test="ladleNo != null and ladleNo != ''">
+			AND a.ladle_no = #{ladleNo}
+		</if>
+		<if test="consignDept != null and consignDept != ''">
+			AND a.consign_dept = #{consignDept}
+		</if>
+		<if test="consignNo != null and consignNo != ''">
+			AND a.consign_no = #{consignNo}
+		</if>
+
+		order by a.start_time
+
+	</select>
+
+	<!--根据车牌号和当前时间查询有效的委托/预约单-->
+	<select id="checkOutByVehicleNo" resultType="Consign">
+		select
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		now()  between  a.start_time and a.end_time
+		<if test="vehicleNo != null and vehicleNo != ''">
+			AND a.vehicle_no = #{vehicleNo}
+		</if>
+
+	</select>
+	<!-- 根据委托单号查询委托单详情 -->
+	<select id="queryInfoByConsignId" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM consign a
+		WHERE a.consign_id = #{consignId}
+		and a.bill_type = "1"
+		AND a.status ='0'
+	</select>
+
+	<!--进厂-->
+	<update id="updateConsignState">
+		UPDATE consign SET
+			consign_state = #{consignState}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 查询当前车牌号是否已进厂 -->
+	<select id="checkStateByVehicleNo" resultType="Consign" >
+		SELECT
+		a.id
+		FROM
+			consign a
+		WHERE
+			a.consign_state = "2"
+			 AND a.status ='0'
+		AND a.vehicle_no = #{vehicleNo}
+	</select>
+
+	<!-- 根据车牌查询当前委托单称重状态 -->
+	<select id="checkWeightStatus" resultType="Consign" >
+		SELECT
+		a.id
+		FROM
+			consign a
+		WHERE
+		a.weight_state = '1'
+		 AND a.status ='0'
+		AND a.vehicle_no = #{vehicleNo}
+	</select>
+
+	<!-- 根据车牌查询当前委托单称重状态 -->
+	<select id="queryConsignByV" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM consign a
+		WHERE
+		 a.status ='0'
+		and a.bill_type = '1'
+		and a.vehicle_no = #{vehicleNo}
+
+	</select>
+
+	<!-- 根据车牌查询当前委托单称重状态 -->
+	<select id="queryConsignByVehicleNo" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM consign a
+		WHERE
+ 		NOW() BETWEEN a.start_time
+ 		AND a.end_time
+		and a.weight_state='1'
+		and a.status='0'
+-- 		and a.bill_type = '1'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+
+	</select>
+
+<!--	排除预约单-->
+	<select id="passYY" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM consign a
+		WHERE
+		NOW() BETWEEN a.start_time
+		AND a.end_time
+		and a.bill_type = '1'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+
+	</select>
+
+	<!--根据车牌号查询当前委托单是否在有效期之内 -->
+	<select id="findValidityByVehicleNo" resultType="Consign">
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		 a.status = '0'
+		and a.vehicle_no =#{vehicleNo}
+        order by a.create_date desc
+        limit 1
+	</select>
+
+	<!--根据车牌号查询当前委托单是否在有效期之内 -->
+	<select id="findlastByVehicleNo" resultType="Consign">
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		NOW() BETWEEN a.start_time
+		AND a.end_time
+		AND a.status = '0'
+		and a.vehicle_no =#{vehicleNo}
+		order by a.create_date desc
+		limit 1
+	</select>
+
+	<!--根据铁水管号查询当前委托单是否在有效期之内 -->
+	<select id="findValidityByLableNo" resultType="Consign">
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		NOW() BETWEEN a.start_time
+		AND a.end_time
+		and a.status = '0'
+		and a.ladle_no =#{ladleNo}
+		order by a.create_date desc
+
+	</select>
+	<!--根据身份证号查询当前委托单 -->
+	<select id="findInfoByIdCard" resultType="Consign">
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		NOW() BETWEEN a.start_time
+		AND a.end_time
+		and a.id_card = #{IDCard}
+		and a.status='0'
+	</select>
+
+    <!-- 过磅页面展示 -->
+    <select id="showweights" resultType="Consign">
+            SELECT
+            <include refid="consignColumns"/>,w.mat_gross_wt AS matGrossWt,w.imp_wt AS impWt,w.mat_wt AS matWt
+            FROM
+            consign a
+            inner join weight w on a.consign_id = w.consign_id and w.weight_flag = '0'
+            WHERE
+        	 a.weight_state = '1'
+        	 and w.status = '0'
+			and a.status='0'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+		<if test="ladleNo != null and ladleNo != ''">
+			AND a.ladle_no = #{ladleNo}
+		</if>
+		<if test="consignDept != null and consignDept != ''">
+			AND a.consign_dept = #{consignDept}
+		</if>
+		<if test="equipNum != null and equipNum != ''">
+			and a.equip_num = #{equipNum}
+		</if>
+		<if test="consignNo != null and consignNo != ''">
+			and a.consign_no = #{consignNo}
+		</if>
+		<choose>
+			<when test="defaultFlag != null and defaultFlag != ''">
+				and NOW() BETWEEN a.start_time
+				and a.end_time
+			</when>
+			<otherwise>
+				and a.default_flag != '1'
+			</otherwise>
+		</choose>
+
+		order by a.create_date desc
+    </select>
+
+	<!-- 过磅页面展示 -->
+	<select id="showweightsall" resultType="Consign">
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		now()  between  a.start_time and a.end_time
+		AND a.weight_state = '0'
+		and a.status='0'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+		<if test="ladleNo != null and ladleNo != ''">
+			AND a.ladle_no = #{ladleNo}
+		</if>
+		<if test="consignDept != null and consignDept != ''">
+			AND a.consign_dept = #{consignDept}
+		</if>
+		<if test="equipNum != null and equipNum != ''">
+			and a.equip_num = #{equipNum}
+		</if>
+		<if test="consignNo != null and consignNo != ''">
+			and a.consign_no = #{consignNo}
+		</if>
+		order by a.create_date desc
+	</select>
+
+	<update id="updateweightState">
+		UPDATE consign SET
+			weight_state=#{weightState}
+		WHERE consign_id = #{consignId}
+	</update>
+
+    <update id="updatesurplusWtByConsignNo">
+		UPDATE consign SET
+			surplus_wt=#{surplusWt}
+		WHERE consign_no = #{consignNo}
+	</update>
+    <update id="updatesurplusWtByConsignId">
+		UPDATE consign SET
+			surplus_wt=#{surplusWt}
+		WHERE consign_id = #{consignId}
+	</update>
+	<update id="updateDefaultFlag">
+		UPDATE consign SET
+			default_flag = #{defaultFlag}
+		WHERE consign_id = #{consignId}
+	</update>
+
+	<!--根据委托单号查询委托单信息-->
+	<select id="queryByConsignId" resultType="Consign">
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE a.consign_id = #{consignId}
+		and a.status='0'
+		order by a.end_time desc
+	</select>
+
+	<!-- 查询一次过磅时，是否有过完一次的委托单-->
+	<select id="queryFirstWeight" resultType="Weight">
+		SELECT
+		a.mat_wt AS "matWt",
+		a.mat_gross_wt AS "matGrossWt",
+		a.imp_wt AS "impWt" from
+		weight a LEFT JOIN consign c on a.consign_id = c.consign_id
+		where
+		c.status='0'
+		and a.status='0'
+		and c.consign_id = #{consignId}
+	</select>
+
+	<!-- 根据委托单号查询委托单详情 -->
+	<select id="queryInterInfoByConsignId" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM consign a
+		WHERE a.consign_id = #{consignId}
+		order by a.end_time desc
+	</select>
+
+
+	<!-- 根据工作站，查询车牌号 -->
+	<select id="queryVehicleNoByEquipNum" resultType="Consign" >
+		SELECT
+		a.vehicle_no vehicleNo
+		FROM consign a
+		WHERE NOW() BETWEEN a.start_time and a.end_time
+		<if test="equipNum != null and equipNum != ''">
+			and a.equip_num = #{equipNum}
+		</if>
+		group by a.vehicle_no
+		ORDER BY a.vehicle_no
+	</select>
+	<!-- 根据工作站，查询铁水罐号 -->
+	<select id="queryLadleNoByEquipNum" resultType="Consign" >
+		SELECT
+		a.ladle_no vehicleNo
+		FROM consign a
+		WHERE NOW() BETWEEN a.start_time and a.end_time
+		<if test="equipNum != null and equipNum != ''">
+			and a.equip_num = #{equipNum}
+		</if>
+		group by a.ladle_no
+		ORDER BY a.ladle_no
+	</select>
+
+	<!-- 查詢當前過期委託單車牌 -->
+	<select id="queryTimeOutConsign" resultType="Consign" >
+
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		LEFT JOIN (
+		SELECT
+		max(c.end_time) t,
+		c.consign_id
+		FROM
+		consign c
+		GROUP BY
+		c.vehicle_no
+		) con ON con.consign_id = a.consign_id
+		WHERE
+		to_days(con.t) = to_days(now())
+		AND con.t &lt; now()
+		AND a. STATUS = 0
+		AND (
+		a.field2 != 'GD'
+		AND a.field2 != 'RY'
+		AND a.field2 != 'NZ'
+		OR a.field2 IS NULL
+		)
+		AND a.vehicle_no NOT IN (
+		SELECT
+		co.vehicle_no
+		FROM
+		consign co
+		JOIN vehicle_info vi ON co.vehicle_no = vi.vehicle_no
+		GROUP BY
+		co.vehicle_no
+		)
+		GROUP BY
+		a.vehicle_no
+	</select>
+	<!-- 查询当天结束且不在车辆信息表中的委托单 -->
+	<select id="queryMaxEndTimeConsign" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		TO_DAYS(a.end_time) = TO_DAYS(NOW())
+		and a.field2 !="GD"
+		AND a.vehicle_no not in (SELECT v.vehicle_no from vehicle_info v)
+		and a.end_time &lt; NOW()
+ 		AND a.pass_code NOT like '%IN-1%'
+		GROUP BY
+		a.vehicle_no
+	</select>
+
+	<!-- 查询一次过磅非锁皮委托 -->
+	<select id="queryStateConsign" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		a.weight_state='1'
+		and a.status='0'
+		and a.bill_type = '1'
+		and a.default_flag !='1'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+	</select>
+	<!-- 查询一次过磅非锁皮委托 -->
+	<select id="queryDefaultFlagConsign" resultType="Consign" >
+		SELECT
+		<include refid="consignColumns"/>
+		FROM
+		consign a
+		WHERE
+		NOW() BETWEEN a.start_time and a.end_time
+		and a.weight_state='1'
+		and a.status='0'
+		and a.bill_type = '1'
+		and a.default_flag ='1'
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+	</select>
+</mapper>

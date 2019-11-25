@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.checkall.mapper.CheckesMapper">
+
+	<sql id="checkesColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.check_number AS "checkNumber",
+		a.equipment_id AS "equipment.id",
+		a.check_method AS "checkMethod",
+		a.maintenexplanation AS "maintenExplanation",
+		a.check_inspector AS "checkInspector.id",
+		a.cheak_date AS "checkDate",
+		a.check_contect AS "checkContect",
+		a.check_result AS "checkResult",
+		a.check_state AS "checkState",
+		a.remarks AS "remarks",
+		a.check_usage AS "checkUsage.id",
+		a.check_suggestion AS "checkSuggestion",
+
+
+
+
+
+
+
+		equipment.equipment AS "equipment.equipment",
+
+
+
+		checkInspector.name AS "checkInspector.name",
+
+
+
+
+
+
+		checkUsage.name AS "checkUsage.name"
+	</sql>
+
+	<sql id="checkesJoins">
+
+		LEFT JOIN check_equipment equipment ON equipment.id = a.equipment_id
+		LEFT JOIN sys_user checkInspector ON checkInspector.id = a.check_inspector
+		LEFT JOIN sys_user checkUsage ON checkUsage.id = a.check_usage
+	</sql>
+
+
+	<select id="get" resultType="Checkes" >
+		SELECT
+		<include refid="checkesColumns"/>
+		FROM checkes a
+		<include refid="checkesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Checkes" >
+		SELECT
+		<include refid="checkesColumns"/>
+		FROM checkes a
+		<include refid="checkesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="checkNumber != null and checkNumber != ''">
+				AND a.check_number = #{checkNumber}
+			</if>
+			<if test="equipment != null and equipment.id != null and equipment.id != ''">
+				AND a.equipment_id = #{equipment.id}
+			</if>
+			<if test="checkInspector != null and checkInspector.id != null and checkInspector.id != ''">
+				AND a.check_inspector = #{checkInspector.id}
+			</if>
+			<if test="checkContect != null and checkContect != ''">
+				AND a.check_contect = #{checkContect}
+			</if>
+			<if test="checkResult != null and checkResult != ''">
+				AND a.check_result = #{checkResult}
+			</if>
+			<if test="checkState != null and checkState != ''">
+				AND a.check_state = #{checkState}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="Checkes" >
+		SELECT
+		<include refid="checkesColumns"/>
+		FROM checkes a
+		<include refid="checkesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO checkes(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			check_number,
+			equipment_id,
+			check_method,
+			maintenexplanation,
+			check_inspector,
+			cheak_date,
+			check_contect,
+			check_result,
+			check_state,
+			remarks,
+			check_usage,
+			check_suggestion
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{checkNumber},
+			#{equipment.id},
+			#{checkMethod},
+			#{maintenExplanation},
+			#{checkInspector.id},
+			#{checkDate},
+			#{checkContect},
+			#{checkResult},
+			#{checkState},
+			#{remarks},
+			#{checkUsage.id},
+			#{checkSuggestion}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE checkes SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			check_number = #{checkNumber},
+			equipment_id = #{equipment.id},
+			check_method = #{checkMethod},
+			maintenexplanation = #{maintenExplanation},
+			check_inspector = #{checkInspector.id},
+			cheak_date = #{checkDate},
+			check_contect = #{checkContect},
+			check_result = #{checkResult},
+			check_state = #{checkState},
+			remarks = #{remarks},
+			check_usage = #{checkUsage.id},
+			check_suggestion = #{checkSuggestion}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM checkes
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE checkes SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Checkes" statementType="STATEMENT">
+		select * FROM checkes  where ${propertyName} = '${value}'
+	</select>
+
+	<!--获取设备管理的设备检查方法和点检设备的描述-->
+	<select id="getEquipment" resultType="Checkes" >
+		SELECT
+        a.equipment AS "equipment",
+		a.check_method AS "checkMethod",
+		a.mainten_explanation AS "maintenExplanation"
+		FROM check_equipment a
+        WHERE a.equipment = #{equip}
+	</select>
+
+</mapper>

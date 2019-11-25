@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.passchecksub.mapper.PassCheckSubMapper">
+    
+	<sql id="passCheckSubColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.archive_flag AS "archiveFlag",
+		a.company_code AS "companyCode",
+		a.company_cname AS "companyCname",
+		a.trnp_app_no AS "trnpAppNo",
+		a.prod_code AS "prodCode",
+		a.prod_cname AS "prodCname",
+		a.mat_spec_desc AS "matSpecDesc",
+		a.out_stock_qty AS "outStockQty",
+		a.measure_unit AS "measureUnit",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="passCheckSubJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="PassCheckSub" >
+		SELECT 
+			<include refid="passCheckSubColumns"/>
+		FROM pass_check_sub a
+		<include refid="passCheckSubJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PassCheckSub" >
+		SELECT 
+			<include refid="passCheckSubColumns"/>
+		FROM pass_check_sub a
+		<include refid="passCheckSubJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="archiveFlag != null and archiveFlag != ''">
+				AND a.archive_flag = #{archiveFlag}
+			</if>
+			<if test="companyCode != null and companyCode != ''">
+				AND a.company_code = #{companyCode}
+			</if>
+			<if test="companyCname != null and companyCname != ''">
+				AND a.company_cname = #{companyCname}
+			</if>
+			<if test="trnpAppNo != null and trnpAppNo != ''">
+				AND a.trnp_app_no = #{trnpAppNo}
+			</if>
+			<if test="prodCode != null and prodCode != ''">
+				AND a.prod_code = #{prodCode}
+			</if>
+			<if test="prodCname != null and prodCname != ''">
+				AND a.prod_cname = #{prodCname}
+			</if>
+			<if test="matSpecDesc != null and matSpecDesc != ''">
+				AND a.mat_spec_desc = #{matSpecDesc}
+			</if>
+			<if test="outStockQty != null and outStockQty != ''">
+				AND a.out_stock_qty = #{outStockQty}
+			</if>
+			<if test="measureUnit != null and measureUnit != ''">
+				AND a.measure_unit = #{measureUnit}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks = #{remarks}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PassCheckSub" >
+		SELECT 
+			<include refid="passCheckSubColumns"/>
+		FROM pass_check_sub a
+		<include refid="passCheckSubJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pass_check_sub(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			archive_flag,
+			company_code,
+			company_cname,
+			trnp_app_no,
+			prod_code,
+			prod_cname,
+			mat_spec_desc,
+			out_stock_qty,
+			measure_unit,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{archiveFlag},
+			#{companyCode},
+			#{companyCname},
+			#{trnpAppNo},
+			#{prodCode},
+			#{prodCname},
+			#{matSpecDesc},
+			#{outStockQty},
+			#{measureUnit},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pass_check_sub SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			archive_flag = #{archiveFlag},
+			company_code = #{companyCode},
+			company_cname = #{companyCname},
+			trnp_app_no = #{trnpAppNo},
+			prod_code = #{prodCode},
+			prod_cname = #{prodCname},
+			mat_spec_desc = #{matSpecDesc},
+			out_stock_qty = #{outStockQty},
+			measure_unit = #{measureUnit},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM pass_check_sub
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE pass_check_sub SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="PassCheckSub" statementType="STATEMENT">
+		select * FROM pass_check_sub  where ${propertyName} = '${value}'
+	</select>
+
+
+    <!-- 通过出门条号查询出门条明细 -->
+	<select id="findPassCheckSubList" resultType="PassCheckSub">
+		SELECT
+		sum(a.out_stock_qty) prodNum,
+		count(a.id) subNum,
+		<include refid="passCheckSubColumns"/>
+		FROM
+		pass_check_sub a
+		where
+		a.trnp_app_no = #{trnpAppNo}
+		GROUP BY a.prod_cname
+	</select>
+	<!-- 通过出门条号查询出门条明细 -->
+	<select id="findCheckSubList" resultType="PassCheckSub">
+		SELECT
+
+		<include refid="passCheckSubColumns"/>
+		FROM
+		pass_check_sub a
+		where
+		a.trnp_app_no = #{trnpAppNo}
+
+	</select>
+</mapper>

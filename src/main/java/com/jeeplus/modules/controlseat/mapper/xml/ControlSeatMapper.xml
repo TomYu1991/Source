@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.controlseat.mapper.ControlSeatMapper">
+    
+	<sql id="controlSeatColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.seat_name AS "seatName",
+		a.seat_num AS "seatNum",
+		a.seat_ip AS "seatIp",
+		a.seat_state AS "seatState"
+	</sql>
+	
+	<sql id="controlSeatJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="ControlSeat" >
+		SELECT 
+			<include refid="controlSeatColumns"/>
+		FROM control_seat a
+		<include refid="controlSeatJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ControlSeat" >
+		SELECT 
+			<include refid="controlSeatColumns"/>
+		FROM control_seat a
+		<include refid="controlSeatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ControlSeat" >
+		SELECT 
+			<include refid="controlSeatColumns"/>
+		FROM control_seat a
+		<include refid="controlSeatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO control_seat(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			seat_name,
+			seat_num,
+			seat_ip,
+			seat_state
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{seatName},
+			#{seatNum},
+			#{seatIp},
+			#{seatState}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE control_seat SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			seat_name = #{seatName},
+			seat_num = #{seatNum},
+			seat_ip = #{seatIp},
+			seat_state = #{seatState}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM control_seat
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE control_seat SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!--修改坐席状态-->
+	<update id="updateSeatState">
+		UPDATE control_seat SET
+			seat_state = #{seatState}
+		WHERE seat_num = #{seatNum}
+	</update>
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="ControlSeat" statementType="STATEMENT">
+		select * FROM control_seat  where ${propertyName} = '${value}'
+	</select>
+
+	<!-- 根据坐席IP查询坐席编号 -->
+	<select id="findInfoByIp" resultType="ControlSeat">
+		select
+		<include refid="controlSeatColumns"/>
+		 FROM control_seat a
+		where
+		a.seat_ip=#{seatIp}
+	</select>
+
+</mapper>

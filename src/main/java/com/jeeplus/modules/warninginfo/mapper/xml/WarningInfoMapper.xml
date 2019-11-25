@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.warninginfo.mapper.WarningInfoMapper">
+    
+	<sql id="warningInfoColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.loginName",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.loginName",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.vehicle_no AS "vehicleNo",
+		a.state AS "state",
+		a.reason AS "reason",
+		a.remarks AS "remarks",
+		a.data_type AS "dataType",
+		a.company_cname AS "companyCname",
+		a.pic AS "pic"
+	</sql>
+	
+	<sql id="warningInfoJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="WarningInfo" >
+		SELECT 
+			<include refid="warningInfoColumns"/>
+		FROM warning_info a
+		<include refid="warningInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WarningInfo" >
+		SELECT 
+			<include refid="warningInfoColumns"/>
+		FROM warning_info a
+		<include refid="warningInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no like #{vehicleNo}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="reason != null and reason != ''">
+				AND a.reason = #{reason}
+			</if>
+			<choose>
+			<when test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+				and a.create_date between #{startTime} and #{endTime}
+			</when>
+			<otherwise>
+				<if test="startTime != null and startTime != ''">
+					AND a.create_date &gt;= #{startTime}
+				</if>
+				<if test="endTime != null and endTime != ''">
+					AND a.create_date &lt;= #{endTime}
+				</if>
+			</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WarningInfo" >
+		SELECT 
+			<include refid="warningInfoColumns"/>
+		FROM warning_info a
+		<include refid="warningInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO warning_info(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			state,
+			vehicle_no,
+			reason,
+			remarks,
+			data_type,
+			company_cname
+		) VALUES (
+			#{id},
+			#{createBy.loginName},
+			#{createDate},
+			#{updateBy.loginName},
+			#{updateDate},
+			#{delFlag},
+			#{state},
+			#{vehicleNo},
+			#{reason},
+			#{remarks},
+			#{dataType},
+			#{companyCname}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE warning_info SET 	
+			update_by = #{updateBy.loginName},
+			update_date = #{updateDate},
+			vehicle_no = #{vehicleNo},
+			reason = #{reason},
+			state=#{state},
+			remarks = #{remarks},
+			data_type=#{dataType},
+			company_cname=#{companyCname}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM warning_info
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE warning_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="WarningInfo" statementType="STATEMENT">
+		select * FROM warning_info  where ${propertyName} = '${value}'
+	</select>
+
+		<!-- 根据车牌查询最近一条记录 -->
+	<select id="findInfoByVehicleNo" resultType="WarningInfo" >
+		SELECT
+		<include refid="warningInfoColumns"/>
+        FROM
+        	warning_info a
+        WHERE
+        	a.vehicle_no = #{vehicleNo}
+        and a.state is null
+		or a.vehicle_no = #{vehicleNo}
+		and a.state !='2'
+	</select>
+
+	<update id="updateDateType">
+		UPDATE warning_info w
+		SET w.data_type = #{dataType}
+		WHERE
+		w.id = #{id}
+	</update>
+
+
+	<insert id="insertInter">
+		INSERT INTO warning_info(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			state,
+			vehicle_no,
+			reason,
+			remarks,
+			data_type,
+			pic
+		) VALUES (
+			#{id},
+			#{createBy.loginName},
+			#{createDate},
+			#{updateBy.loginName},
+			#{updateDate},
+			#{delFlag},
+			#{state},
+			#{vehicleNo},
+			#{reason},
+			#{remarks},
+			#{dataType},
+			#{pic}
+		)
+	</insert>
+<!--	已批过夜车辆-->
+	<select id="getApproveVehicleList" resultType="WarningInfo">
+		SELECT * FROM `warning_info` w where w.reason like '%过夜车辆%' and state ='2' and w.create_date BETWEEN #{startTime} and #{endTime};
+	</select>
+<!--	未批过夜车辆-->
+	<select id="getUnapproveVehicleList" resultType="WarningInfo">
+		SELECT * FROM `warning_info` w where w.reason like '%过夜车辆%' and state ='1' and w.create_date BETWEEN #{startTime} and #{endTime};
+	</select>
+<!--	违章车辆-->
+	<select id="getWarningInfoVehicleList" resultType="WarningInfo">
+		select * from warning_info i where i.create_date BETWEEN #{startTime} and #{endTime};
+	</select>
+</mapper>

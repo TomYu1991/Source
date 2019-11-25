@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.weightrecord.mapper.WeightRecordMapper">
+    
+	<sql id="weightRecordColumns">
+		a.create_by AS "createBy.loginName",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.loginName",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.weigh_no AS "weighNo",
+		a.consign_id AS "consignId",
+		a.vehicle_no AS "vehicleNo",
+		a.ladle_no AS "ladleNo",
+		a.prod_cname AS "prodCname",
+		a.sg_sign AS "sgSign",
+		a.mat_wt AS "matWt",
+		a.mat_gross_wt AS "matGrossWt",
+		a.imp_wt AS "impWt",
+		a.status AS "status",
+		a.consigne_user AS "consigneUser",
+		a.supplier_name AS "supplierName",
+		a.fist_station AS "fistStation",
+		a.second_station AS "secondStation",
+		a.grosstime AS "grosstime",
+		a.taretime AS "taretime",
+		a.default_flag AS "defaultFlag",
+		a.id AS "id"
+	</sql>
+	
+	<sql id="weightRecordJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="WeightRecord" >
+		SELECT 
+			<include refid="weightRecordColumns"/>
+		FROM weight a
+		<include refid="weightRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WeightRecord" >
+		SELECT 
+			<include refid="weightRecordColumns"/>
+		FROM weight a
+		<include refid="weightRecordJoins"/>
+		<where>
+
+			${dataScope}
+			<if test="weighNo != null and weighNo != ''">
+				AND a.weigh_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{weighNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{weighNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{weighNo},'%')</if>
+			</if>
+			<if test="consignId != null and consignId != ''">
+				AND a.consign_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{consignId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{consignId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{consignId},'%')</if>
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{vehicleNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{vehicleNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{vehicleNo},'%')</if>
+			</if>
+			<if test="ladleNo != null and ladleNo != ''">
+				AND a.ladle_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{ladleNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{ladleNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{ladleNo},'%')</if>
+			</if>
+			<if test="prodCname != null and prodCname != ''">
+				AND a.prod_cname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{prodCname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{prodCname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{prodCname},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="consigneUser != null and consigneUser != ''">
+				AND a.consigne_user LIKE 
+					<if test="dbName == 'oracle'">'%'||#{consigneUser}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{consigneUser}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{consigneUser},'%')</if>
+			</if>
+			<if test="supplierName != null and supplierName != ''">
+				AND a.supplier_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{supplierName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{supplierName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{supplierName},'%')</if>
+			</if>
+			<if test="fistStation != null and fistStation != ''">
+				AND a.fist_station = #{fistStation}
+			</if>
+			<if test="secondStation != null and secondStation != ''">
+				AND a.second_station = #{secondStation}
+			</if>
+			<if test="defaultFlag != null and defaultFlag != ''">
+				AND a.default_flag = #{defaultFlag}
+			</if>
+			<if test="begintaretime != null and begintaretime != '' and endtaretime != null and endtaretime != ''">
+				AND a.create_time BETWEEN #{begintaretime} AND #{endtaretime}
+			</if>
+			<if test="begintaretime != null and begintaretime != ''">
+				AND a.create_time &gt;= #{begintaretime}
+			</if>
+			<if test="endtaretime != null and endtaretime != ''">
+				AND a.create_time &lt;= #{endtaretime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WeightRecord" >
+		SELECT 
+			<include refid="weightRecordColumns"/>
+		FROM weight a
+		<include refid="weightRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO weight(
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			weigh_no,
+			consign_id,
+			vehicle_no,
+			ladle_no,
+			prod_cname,
+			sg_sign,
+			mat_wt,
+			mat_gross_wt,
+			imp_wt,
+			status,
+			consigne_user,
+			supplier_name,
+			fist_station,
+			second_station,
+			grosstime,
+			taretime,
+			default_flag,
+			id
+		) VALUES (
+			#{createBy.loginName},
+			#{createDate},
+			#{updateBy.loginName},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{weighNo},
+			#{consignId},
+			#{vehicleNo},
+			#{ladleNo},
+			#{prodCname},
+			#{sgSign},
+			#{matWt},
+			#{matGrossWt},
+			#{impWt},
+			#{status},
+			#{consigneUser},
+			#{supplierName},
+			#{fistStation},
+			#{secondStation},
+			#{grosstime},
+			#{taretime},
+			#{defaultFlag},
+			#{id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weight SET 	
+			update_by = #{updateBy.loginName},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			weigh_no = #{weighNo},
+			consign_id = #{consignId},
+			vehicle_no = #{vehicleNo},
+			ladle_no = #{ladleNo},
+			prod_cname = #{prodCname},
+			sg_sign = #{sgSign},
+			mat_wt = #{matWt},
+			mat_gross_wt = #{matGrossWt},
+			imp_wt = #{impWt},
+			status = #{status},
+			consigne_user = #{consigneUser},
+			supplier_name = #{supplierName},
+			fist_station = #{fistStation},
+			second_station = #{secondStation},
+			grosstime = #{grosstime},
+			taretime = #{taretime},
+			default_flag = #{defaultFlag},
+			id = #{id}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM weight
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE weight SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="WeightRecord" statementType="STATEMENT">
+		select * FROM weight  where ${propertyName} = '${value}'
+	</select>
+
+	<select id="queryInfoByWeighNo" resultType="WeightRecord">
+		select
+		<include refid="weightRecordColumns"/>
+		FROM weight a
+		where a.weigh_no = #{weighNo}
+	</select>
+</mapper>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.errorimp.mapper.ErrorImpMapper">
+    
+	<sql id="errorImpColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.imp_wt AS "impWt",
+		a.old_imp AS "oldImp",
+		a.vehicle_no AS "vehicleNo",
+		a.station_ip AS "stationIp",
+		a.consign_id AS "consignId",
+		a.prod_cname AS "prodCname",
+		a.beiyong1 AS "beiyong1",
+		a.beiyong2 AS "beiyong2"
+	</sql>
+	
+	<sql id="errorImpJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="ErrorImp" >
+		SELECT 
+			<include refid="errorImpColumns"/>
+		FROM error_imp a
+		<include refid="errorImpJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ErrorImp" >
+		SELECT 
+			<include refid="errorImpColumns"/>
+		FROM error_imp a
+		<include refid="errorImpJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="beginCreateDate != null and endCreateDate != null ">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="impWt != null and impWt != ''">
+				AND a.imp_wt LIKE 
+					<if test="dbName == 'oracle'">'%'||#{impWt}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{impWt}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{impWt},'%')</if>
+			</if>
+			<if test="oldImp != null and oldImp != ''">
+				AND a.old_imp LIKE 
+					<if test="dbName == 'oracle'">'%'||#{oldImp}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{oldImp}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{oldImp},'%')</if>
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{vehicleNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{vehicleNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{vehicleNo},'%')</if>
+			</if>
+			<if test="stationIp != null and stationIp != ''">
+				AND a.station_ip = #{stationIp}
+			</if>
+			<if test="consignId != null and consignId != ''">
+				AND a.consign_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{consignId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{consignId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{consignId},'%')</if>
+			</if>
+			<if test="prodCname != null and prodCname != ''">
+				AND a.prod_cname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{prodCname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{prodCname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{prodCname},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ErrorImp" >
+		SELECT 
+			<include refid="errorImpColumns"/>
+		FROM error_imp a
+		<include refid="errorImpJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO error_imp(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			imp_wt,
+			old_imp,
+			vehicle_no,
+			station_ip,
+			consign_id,
+			prod_cname,
+			beiyong1,
+			beiyong2
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{impWt},
+			#{oldImp},
+			#{vehicleNo},
+			#{stationIp},
+			#{consignId},
+			#{prodCname},
+			#{beiyong1},
+			#{beiyong2}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE error_imp SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			imp_wt = #{impWt},
+			old_imp = #{oldImp},
+			vehicle_no = #{vehicleNo},
+			station_ip = #{stationIp},
+			consign_id = #{consignId},
+			prod_cname = #{prodCname},
+			beiyong1 = #{beiyong1},
+			beiyong2 = #{beiyong2}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM error_imp
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE error_imp SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="ErrorImp" statementType="STATEMENT">
+		select * FROM error_imp  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

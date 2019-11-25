@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.matrix.widget.mapper.AutoCompleteWidgetMapper">
+    <!--查询统一客户信息-->
+	<sql id="searchUnifiedCustomers">
+		select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        c.no id,c.CNAME value from UNIFIEDCUSTOMER c
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+	</sql>
+    <!--查询客户-->
+    <sql id="searchCustomersInfo">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        c.no id,c.CNAME value from CUSTOMER c
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--级联客户(部门)-->
+    <sql id="searchCustomers">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        c.no id,c.CNAME value from CUSTOMER c
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+            and c.partid = #{condition}
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--级联客户(机构)-->
+    <sql id="searchCustomersForBelong">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        c.no id,c.CNAME value from CUSTOMER c
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+            and c.belong = #{condition}
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--级联物资（部门）-->
+    <sql id="searchVarietys">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        C.NO ID,C.VNAME VALUE FROM VARIETY C
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+            AND C.PARTID = #{condition}
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+
+    <!--级联物资（机构）-->
+    <sql id="searchVarietyOfBelong">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        C.NO ID,C.VNAME VALUE FROM VARIETY C
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+            and C.GROUPID = #{condition}
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+
+    <!--统一物资-->
+    <sql id="searchUnifiedVariety">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        v.NO ID,v.VNAME VALUE FROM unifiedvariety v
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--查询物资-->
+    <sql id="searchVarietysInfo">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        C.NO ID,C.VNAME VALUE FROM VARIETY C
+        <where>
+            SPELLCODE like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--车辆检索 VEHICLE-->
+    <sql id="searchVehicle">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        v.TRUCKNO ID,v.TRUCKNO VALUE FROM   VEHICLE v
+        <where>
+            TRUCKNO like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--集控车号检索 VEHICLE-->
+    <sql id="searchVehicleNoVarietys">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        v.vehicle_no ID,v.vehicle_no VALUE FROM   consign v
+        <where>
+            v.vehicle_no like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+        </where>
+
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        group by v.vehicle_no
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+    <!--场地检索 SHIPSPACE-->
+    <sql id="searchShipSpace">
+        select
+        <if test="dbName == 'mssql'">  top 10 </if>
+        S.ID ID,S.SPACENAME VALUE FROM   SHIPSPACE S
+        <where>
+            SPACENAME like
+            <if test="dbName == 'oracle'">upper('%'||#{keyvalue}||'%')</if>
+            <if test="dbName == 'mssql'">'%'+#{keyvalue}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{keyvalue},'%')</if>
+
+        </where>
+        <if test="dbName == 'oracle'"> and <![CDATA[ rownum<=10 ]]> </if>
+        <if test="dbName == 'mysql'">  limit 10 </if>
+    </sql>
+
+	<select id="execSelectSql" parameterType="Map"  resultType="java.util.LinkedHashMap">
+        <if test='sqlid == "searchUnifiedCustomers"'>
+            <include refid="searchUnifiedCustomers"></include>
+        </if>
+        <if test='sqlid == "searchVehicleNoVarietys"'>
+            <include refid="searchVehicleNoVarietys"></include>
+        </if>
+		    <if test='sqlid == "searchCustomers"'>
+            <include refid="searchCustomers"></include>
+        </if>
+        <if test='sqlid == "searchVarietys"'>
+            <include refid="searchVarietys"></include>
+        </if>
+        <if test='sqlid == "searchUnifiedVariety"'>
+            <include refid="searchUnifiedVariety"></include>
+        </if>
+        <if test='sqlid == "searchVehicle"'>
+          <include refid="searchVehicle"></include>
+        </if>
+        <if test='sqlid == "searchVarietysInfo"'>
+            <include refid="searchVarietysInfo"></include>
+        </if>
+        <if test='sqlid == "searchCustomersInfo"'>
+            <include refid="searchCustomersInfo"></include>
+        </if>
+        <if test='sqlid == "searchCustomersForBelong"'>
+            <include refid="searchCustomersForBelong"></include>
+        </if>
+        <if test='sqlid == "searchShipSpace"'>
+          <include refid="searchShipSpace"></include>
+        </if>
+        <if test='sqlid == "searchVarietyOfBelong"'>
+            <include refid="searchVarietyOfBelong"></include>
+        </if>
+	</select>
+
+</mapper>

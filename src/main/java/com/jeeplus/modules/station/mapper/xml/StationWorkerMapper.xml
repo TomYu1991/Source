@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.station.mapper.StationWorkerMapper">
+    
+	<sql id="stationWorkerColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.station_id AS "station.id",
+		a.user_id AS "user.id",
+		a.remarks AS "remarks",
+		user.name AS "user.name"
+	</sql>
+	
+	<sql id="stationWorkerJoins">
+		
+			LEFT JOIN work_station b ON b.id = a.station_id
+		LEFT JOIN sys_user user ON user.id = a.user_id
+	</sql>
+	
+    
+	<select id="get" resultType="StationWorker" >
+		SELECT 
+			<include refid="stationWorkerColumns"/>
+		FROM station_worker a
+		<include refid="stationWorkerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="StationWorker" >
+		SELECT 
+			<include refid="stationWorkerColumns"/>
+		FROM station_worker a
+		<include refid="stationWorkerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="station != null and station.id != null and station.id != ''">
+				AND a.station_id = #{station.id}
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="StationWorker" >
+		SELECT 
+			<include refid="stationWorkerColumns"/>
+		FROM station_worker a
+		<include refid="stationWorkerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO station_worker(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			station_id,
+			user_id,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{station.id},
+			#{user.id},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE station_worker SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			station_id = #{station.id},
+			user_id = #{user.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM station_worker
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE station_id = #{station.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE station_worker SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE station_id = #{station.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="StationWorker" statementType="STATEMENT">
+		select * FROM station_worker  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

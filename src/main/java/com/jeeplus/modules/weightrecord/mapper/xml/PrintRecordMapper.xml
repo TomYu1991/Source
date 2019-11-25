@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.weightrecord.mapper.PrintRecordMapper">
+    
+	<sql id="printRecordColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.loginName",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.loginName",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.operation AS "operation",
+		a.station_ip AS "stationIp",
+		a.vehicle_no AS "vehicleNo",
+		a.ponder_no AS "weight.weighNo",
+		a.ladel_no AS "ladelNo"
+	</sql>
+	
+	<sql id="printRecordJoins">
+		
+			LEFT JOIN weight b ON b.id = a.ponder_no
+	</sql>
+	
+    
+	<select id="get" resultType="PrintRecord" >
+		SELECT 
+			<include refid="printRecordColumns"/>
+		FROM print_record a
+		<include refid="printRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PrintRecord" >
+		SELECT 
+			<include refid="printRecordColumns"/>
+		FROM print_record a
+		<include refid="printRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="weight != null and weight.weighNo != null and weight.weighNo != ''">
+				AND a.ponder_no = #{weight.weighNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PrintRecord" >
+		SELECT 
+			<include refid="printRecordColumns"/>
+		FROM print_record a
+		<include refid="printRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO print_record(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			operation,
+			station_ip,
+			vehicle_no,
+			ponder_no,
+			ladel_no
+		) VALUES (
+			#{id},
+			#{createBy.loginName},
+			#{createDate},
+			#{updateBy.loginName},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{operation},
+			#{stationIp},
+			#{vehicleNo},
+			#{weight.weighNo},
+			#{ladelNo}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE print_record SET 	
+			update_by = #{updateBy.loginName},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			operation = #{operation},
+			station_ip = #{stationIp},
+			vehicle_no = #{vehicleNo},
+			ponder_no = #{weight.weighNo},
+			ladel_no = #{ladelNo}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM print_record
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE ponder_no = #{weight.weighNo}
+			</otherwise>
+		</choose>
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE print_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE ponder_no = #{weight.weighNo}
+			</otherwise>
+		</choose>
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="PrintRecord" statementType="STATEMENT">
+		select * FROM print_record  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

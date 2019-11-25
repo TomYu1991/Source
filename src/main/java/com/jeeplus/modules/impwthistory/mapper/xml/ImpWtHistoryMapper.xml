@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.impwthistory.mapper.ImpWtHistoryMapper">
+    
+	<sql id="impWtHistoryColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.vehicle_no AS "vehicleNo",
+        a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.tare_head_pic AS "tareHeadPic",
+        a.tare_tail_pic AS "tareTailPic",
+        a.tare_top_pic AS tareTopPic,
+        a.consign_id AS "consignId",
+		a.imp_wt AS "impWt"
+	</sql>
+	
+	<sql id="impWtHistoryJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="ImpWtHistory" >
+		SELECT 
+			<include refid="impWtHistoryColumns"/>
+		FROM imp_wt_history a
+		<include refid="impWtHistoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ImpWtHistory" >
+		SELECT 
+			<include refid="impWtHistoryColumns"/>
+		FROM imp_wt_history a
+		<include refid="impWtHistoryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no = #{vehicleNo}
+			</if>
+			<if test="impWt != null and impWt != ''">
+				AND a.imp_wt = #{impWt}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ImpWtHistory" >
+		SELECT 
+			<include refid="impWtHistoryColumns"/>
+		FROM imp_wt_history a
+		<include refid="impWtHistoryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO imp_wt_history(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			vehicle_no,
+			start_time,
+		    end_time,
+			tare_head_pic,
+			tare_tail_pic,
+			tare_top_pic,
+			consign_id,
+			imp_wt
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{vehicleNo},
+			#{startTime},
+		    #{endTime},
+		    #{tareHeadPic},
+			#{tareTailPic},
+			#{tareTopPic},
+			#{consignId},
+			#{impWt}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE imp_wt_history SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			vehicle_no = #{vehicleNo},
+			start_time = #{startTime},
+		    end_time = #{endTime},
+		    tare_head_pic =#{tareHeadPic},
+			tare_tail_pic = #{tareTailPic},
+			tare_top_pic = #{tareTopPic},
+			consign_id = #{consignId},
+			imp_wt = #{impWt}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM imp_wt_history
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE imp_wt_history SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="ImpWtHistory" statementType="STATEMENT">
+		select * FROM imp_wt_history  where ${propertyName} = '${value}'
+	</select>
+
+	<!--查询最近一次皮重记录-->
+	<select id="queryImpWtHistory" resultType="ImpWtHistory">
+		select <include refid="impWtHistoryColumns"/>
+		FROM imp_wt_history a
+		where
+		a.consign_id = #{consignId}
+		and a.del_flag='0'
+		order by a.create_date desc
+		limit 1
+	</select>
+
+	<!--通过委托单查询皮重历史信息-->
+	<select id="queryImpWtHistoryByConsignId" resultType="ImpWtHistory">
+		select
+		<include refid="impWtHistoryColumns"/>
+		FROM imp_wt_history a
+		where
+		a.consign_id = #{consignId}
+        and a.del_flag = '0'
+	</select>
+	<!--逻辑删除-->
+	<update id="deleteImpWtHistory">
+		UPDATE imp_wt_history SET
+			del_flag = '1'
+		WHERE consign_id = #{consignId}
+	</update>
+
+	<update id="updatePic">
+		UPDATE imp_wt_history SET
+		    tare_head_pic =#{tareHeadPic},
+			tare_tail_pic = #{tareTailPic},
+			tare_top_pic = #{tareTopPic}
+		WHERE id = #{id}
+	</update>
+
+
+	<update id="updateTime">
+		UPDATE imp_wt_history SET
+		    start_time =#{startTime},
+			end_time = #{endTime},
+		WHERE consign_id = #{consignId}
+	</update>
+
+	<!-- 根据委托单号删除历史皮重-->
+	<delete id="deleteByVehicleNo">
+		UPDATE imp_wt_history SET
+			del_flag = '1'
+		WHERE
+	    vehicle_no = #{vehicleNo}
+	</delete>
+
+	<!--查询皮重历史平均值-->
+	<select id="queryImpWtHistoryAvg" resultType="ImpWtHistory">
+		SELECT
+		AVG(c.imp_wt) impAvg
+FROM
+	(
+		SELECT
+			i.imp_wt
+		FROM
+			imp_wt_history i
+		WHERE
+			i.vehicle_no = #{vehicleNo}
+			and i.del_flag = '0'
+		ORDER BY
+			i.create_date DESC
+		LIMIT 10
+	) c
+	</select>
+</mapper>

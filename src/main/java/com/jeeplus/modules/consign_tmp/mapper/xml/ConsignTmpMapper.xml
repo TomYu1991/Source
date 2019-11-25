@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.consign_tmp.mapper.ConsignTmpMapper">
+    
+	<sql id="consignTmpColumns">
+		a.id AS "id",
+		a.opt_flag as "optFlag",
+		a.create_time as "createTime",
+		a.type_code as "typeCode",
+		a.flag as "flag",
+		a.del_flag AS "delFlag",
+		a.bill_type AS "type",
+		a.consign_no AS "consignNo",
+		a.consign_id AS "consignId",
+		a.consign_user AS "consignUser",
+		a.consign_dept AS "consignDept",
+		a.weight_type AS "weightType",
+		a.equip_num AS "equipNum",
+		a.prod_code AS "prodCode",
+		a.prod_cname AS "prodCname",
+		a.sg_code AS "sgCode",
+		a.sg_sign AS "sgSign",
+		a.mat_spec_desc AS "matSpecDesc",
+		a.bill_no AS "billNo",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.surplus_wt AS "surplusWt",
+		a.total_wt AS "totalWt",
+		a.supplier_name AS "supplierName",
+		a.consigne_user AS "consigneUser",
+		a.content AS "content",
+		a.deal_person_no AS "dealPersonNo",
+		a.deal_dept AS "dealDept",
+		a.tel_num AS "telNum",
+		a.vehicle_no AS "vehicleNo",
+		a.user_name AS "userName",
+		a.carry_company_name AS "carryCompanyName",
+		a.tel AS "tel",
+		a.pass_code AS "passCode",
+		a.blast_furnace_no AS "blastFurnaceNo",
+		a.ladle_no AS "ladleNo",
+		a.consign_state AS "consignState",
+		a.company_cname AS "companyCname",
+		a.trans_contact_person AS "transContactPerson",
+		a.id_card AS "IDCard",
+		a.trans_contact_person_tel AS "transContactPersonTel",
+		a.rfid_no AS "rfidNo",
+		a.data_type AS "dateType",
+		a.weight_state AS "weightState",
+		a.status AS "status",
+		a.data_sources AS "dataSources",
+		a.default_flag AS "defaultFlag",
+		a.ponder_flag AS "ponderFlag",
+		a.more_rate AS "moreRate",
+		a.code_flag AS "codeFlag",
+		a.field1 AS "field1",
+		a.field2 AS "field2",
+		a.field3 AS "field3",
+		a.field4 AS "field4",
+		a.field5 AS "field5",
+		a.field_n1 AS "fieldN1",
+		a.field_n2 AS "fieldN2",
+		a.field_n3 AS "fieldN3",
+		a.weigh_no as "weighNo",
+		a.affirm_flag as "affirmFlag",
+		a.confirm_person_no as "confirmPersonNo",
+		a.confirm_time as "confirmTime"
+-- 		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="consignTmpJoins">
+		
+	</sql>
+	
+    
+
+	
+
+	<select id="findListByOptflag" resultType="ConsignTmp" >
+		SELECT
+		<include refid="consignTmpColumns"/>
+		FROM consign_tmp a
+		where
+		a.opt_flag = '0'
+		order by a.create_time
+	</select>
+
+	<update id="updateConsignTmp">
+		update consign_tmp set opt_flag=#{optFlag}
+		where
+		id = #{id}
+	</update>
+</mapper>

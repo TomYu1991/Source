@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.check.mapper.DeviceCheckItemMapper">
+    
+	<sql id="DeviceCheckItemColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.config_id as "configId",
+		a.device_name AS "deviceName",
+		a.check_item AS "checkItem",
+		a.check_content as "checkContent",
+		a.check_reference as "checkReference",
+		a.check_method as "checkMethod",
+		a.device_state as "deviceState"
+	</sql>
+	
+	<sql id="DeviceCheckItemJoins">
+-- 		left join device_check_citem b on a.config_id=b.id
+	</sql>
+	
+    
+	<select id="get" resultType="DeviceCheckItem" >
+		SELECT 
+			<include refid="DeviceCheckItemColumns"/>
+		FROM device_check_citem a
+		<include refid="DeviceCheckItemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+	<resultMap id="ConfigItemMap" type="DeviceCheckItem">
+		<id column="id" property="id"/>
+		<result column="device_name" property="deviceName"/>
+		<result column="check_item" property="checkItem"/>
+		<result column="check_content" property="checkContent"/>
+		<result column="check_reference" property="checkReference"/>
+		<result column="check_method" property="checkMethod"/>
+		<result column="device_state" property="deviceState"/>
+		<association property="deviceCheckConfig" javaType="DeviceCheckConfig">
+			<id column="id" property="id"/>
+			<result column="working_group" property="workingGroup"/>
+			<result column="group_leader" property="groupLeader"/>
+			<result column="group_worker" property="groupWorker"/>
+			<result column="working_area" property="workingArea"/>
+			<result column="check_cycle" property="checkCycle"/>
+			<result column="check_date" property="checkDate"/>
+			<result column="is_enable" property="isEnable"/>
+		</association>
+	</resultMap>
+	<select id="getConfigItemById" resultMap="ConfigItemMap">
+		select a.*,b.* from device_check_citem a left join device_check_config b on a.config_id=b.id
+		where b.id=#{id}
+	</select>
+
+	<select id="findList" resultType="DeviceCheckItem" >
+		SELECT 
+			<include refid="DeviceCheckItemColumns"/>
+
+		FROM device_check_citem a
+		<include refid="DeviceCheckItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+<!--			<if test="deviceName != null and deviceName != ''">-->
+<!--				AND a.device_name like #{deviceName}-->
+<!--			</if>-->
+<!--			<if test="checkMethod != null and checkMethod != ''">-->
+<!--				AND a.check_method like #{checkMethod}-->
+<!--			</if>-->
+ 			<if test="configId != null and configId != ''">
+				AND a.config_id = #{configId}
+			</if>
+<!--			<if test="isEnable != null and isEnable != ''">-->
+<!--				AND a.is_enable = #{isEnable}-->
+<!--			</if>-->
+<!--			<if test="cardSerial != null and cardSerial != ''">-->
+<!--				AND a.card_serial like #{cardSerial}-->
+<!--			</if>-->
+<!--			<if test="beginCheckDate != null and beginCheckDate != '' and endCheckDate != null and endCheckDate != ''">-->
+<!--				AND a.check_date BETWEEN #{beginCheckDate} AND #{endCheckDate}-->
+<!--			</if>-->
+<!--			<if test="beginCheckDate != null and beginCheckDate != ''">-->
+<!--				AND a.check_date &gt;= #{beginCheckDate}-->
+<!--			</if>-->
+<!--			<if test="endCheckDate != null and endCheckDate != ''">-->
+<!--				AND a.check_date &lt;= #{endCheckDate}-->
+<!--			</if>-->
+<!--			<if test="passStation != null and passStation != ''">-->
+<!--				AND a.pass_station = #{passStation}-->
+<!--			</if>-->
+<!--			<if test="passType != null and passType != ''">-->
+<!--				AND a.pass_type = #{passType}-->
+<!--			</if>-->
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DeviceCheckItem" >
+		SELECT 
+			<include refid="DeviceCheckItemColumns"/>
+		FROM device_check_citem a
+		<include refid="DeviceCheckItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO device_check_citem(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			config_id,
+			device_name,
+			check_item,
+			check_content,
+			check_reference,
+			check_method,
+			device_state
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{configId},
+			#{deviceName},
+			#{checkItem},
+			#{checkContent},
+			#{checkReference},
+			#{checkMethod},
+			#{deviceState}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE device_check_citem SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			config_id = #{configId},
+			device_name = #{deviceName},
+			check_item = #{checkItem},
+	 		check_content = #{checkContent},
+			check_reference = #{checkReference},
+			check_method = #{checkMethod},
+			device_state = #{deviceState}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM device_check_citem
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE device_check_citem SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+<!--	&lt;!&ndash; 根据实体名称和字段名称和字段值获取唯一记录 &ndash;&gt;-->
+<!--	<select id="findUniqueByProperty" resultType="DeviceCheckItem" statementType="STATEMENT">-->
+<!--		select * FROM device_check_citem  where ${propertyName} = '${value}'-->
+<!--	</select>-->
+
+<!--	<select id="findInfoByCard" resultType="DeviceCheckItem">-->
+<!--		SELECT-->
+<!--		p.personnel_id personnelId,-->
+<!--		p.name,-->
+<!--		p.sex,-->
+<!--		p.dept_name deptName FROM user_pass_info p-->
+<!--		WHERE-->
+<!--		p.card_serial = #{cardSerial}-->
+<!--	</select>-->
+
+<!--	<insert id="saveUserPassInfo">-->
+<!--		INSERT INTO user_pass_info(-->
+<!--			id,-->
+<!--			personnel_id,-->
+<!--			name,-->
+<!--			sex,-->
+<!--			card_serial,-->
+<!--			dept_name-->
+<!--		) VALUES (-->
+<!--			#{id},-->
+<!--			#{personnelId},-->
+<!--			#{name},-->
+<!--			#{sex},-->
+<!--			#{cardSerial},-->
+<!--			#{deptName}-->
+<!--		)-->
+<!--	</insert>-->
+
+
+
+
+</mapper>

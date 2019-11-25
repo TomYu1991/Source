@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.illegalinfo.mapper.IllegalInfoMapper">
+    
+	<sql id="illegalInfoColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.monitor_position AS "monitorPosition",
+		a.vehicle_no AS "vehicleNo",
+		a.supplier_name AS "supplierName",
+		a.consigne_user AS "consigneUser",
+		a.pass_time AS "passTime",
+		a.take_photo AS "takePhoto",
+		a.warning_info AS "warningInfo",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="illegalInfoJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="IllegalInfo" >
+		SELECT 
+			<include refid="illegalInfoColumns"/>
+		FROM illegalinfo a
+		<include refid="illegalInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="IllegalInfo" >
+		SELECT 
+			<include refid="illegalInfoColumns"/>
+		FROM illegalinfo a
+		<include refid="illegalInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="monitorPosition != null and monitorPosition != ''">
+				AND a.monitor_position = #{monitorPosition}
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no like #{vehicleNo}
+			</if>
+			<if test="supplierName != null and supplierName != ''">
+				AND a.supplier_name like #{supplierName}
+			</if>
+			<if test="consigneUser != null and consigneUser != ''">
+				AND a.consigne_user like #{consigneUser}
+			</if>
+			<if test="begiPassTime != null and begiPassTime != '' and endPassTime != null and endPassTime != ''">
+				AND a.pass_time BETWEEN #{begiPassTime} AND #{endPassTime}
+			</if>
+			<if test="begiPassTime != null and begiPassTime != ''">
+				AND a.pass_time &gt;= #{begiPassTime}
+			</if>
+			<if test="endPassTime != null and endPassTime != ''">
+				AND a.pass_time &lt;= #{endPassTime}
+			</if>
+			<if test="takePhoto != null and takePhoto != ''">
+				AND a.take_photo = #{takePhoto}
+			</if>
+			<if test="warningInfo != null and warningInfo != ''">
+				AND a.warning_info = #{warningInfo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="IllegalInfo" >
+		SELECT 
+			<include refid="illegalInfoColumns"/>
+		FROM illegalinfo a
+		<include refid="illegalInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO illegalinfo(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			monitor_position,
+			vehicle_no,
+			supplier_name,
+			consigne_user,
+			pass_time,
+			take_photo,
+			warning_info,
+			remarks
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{monitorPosition},
+			#{vehicleNo},
+			#{supplierName},
+			#{consigneUser},
+			#{passTime},
+			#{takePhoto},
+			#{warningInfo},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE illegalinfo SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			monitor_position = #{monitorPosition},
+			vehicle_no = #{vehicleNo},
+			supplier_name = #{supplierName},
+			consigne_user = #{consigneUser},
+			pass_time = #{passTime},
+			take_photo = #{takePhoto},
+			warning_info = #{warningInfo},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM illegalinfo
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE illegalinfo SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!--保存图片-->
+	<update id="savePhoto">
+		UPDATE illegalinfo SET
+			take_photo = #{takePhoto}
+		WHERE id = #{id}
+	</update>
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="IllegalInfo" statementType="STATEMENT">
+		select * FROM illegalinfo  where ${propertyName} = '${value}'
+	</select>
+
+	<select id="queryLateInfoByVehicleNo" resultType="IllegalInfo" >
+		SELECT
+		<include refid="illegalInfoColumns"/>
+		FROM illegalinfo a
+
+		WHERE a.vehicle_no = #{vehicleNo}
+		order by a.pass_time desc
+		limit 1
+	</select>
+</mapper>

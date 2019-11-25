@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.passcheck.mapper.PassCheckMapper">
+    
+	<sql id="passCheckColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.trnp_app_no AS "trnpAppNo",
+		a.user_code AS "userCode",
+		a.user_name AS "userName",
+		a.vehicle_no AS "vehicleNo",
+		a.trans_contact_person AS "transContactPerson",
+		a.dept_code AS "deptCode",
+		a.dep_name AS "depName",
+		a.deal_person_no AS "dealPersonNo",
+		a.deal_person_name AS "dealPersonName",
+		a.deal_date AS "dealDate",
+		a.rfid_no AS "rfidNo",
+		a.pass_code AS "passCode",
+		a.archive_flag AS "archiveFlag",
+		a.company_code AS "companyCode",
+		a.company_cname AS "companyCname",
+		a.type_code AS "typeCode",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.carry_company_name AS "carryCompanyName",
+		a.apply_time AS "applyTime",
+		a.apply_person_no AS "applyPersonNo",
+		a.approve_time AS "approveTime",
+		a.approve_person_no AS "approvePersonNo",
+		a.valid_flag AS "validFlag",
+		a.feedback_flag AS "feedbackFlag",
+		a.feeback_content AS "feebackContent",
+		a.remark AS "remark",
+		a.data_type AS "dataType"
+	</sql>
+	
+	<sql id="passCheckJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="PassCheck" >
+		SELECT 
+			<include refid="passCheckColumns"/>
+		FROM pass_check a
+		<include refid="passCheckJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PassCheck" >
+		SELECT
+			<include refid="passCheckColumns"/>
+		FROM pass_check a
+		<include refid="passCheckJoins"/>
+		<where>
+			a.del_flag = '0'
+
+			<if test="trnpAppNo != null and trnpAppNo != ''">
+				AND a.trnp_app_no like #{trnpAppNo}
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no  like #{vehicleNo}
+			</if>
+
+			<if test="depName != null and depName != ''">
+				AND a.dep_name = #{depName}
+			</if>
+			<if test="dealPersonName != null and dealPersonName != ''">
+				AND a.deal_person_name = #{dealPersonName}
+			</if>
+
+			<if test="rfidNo != null and rfidNo != ''">
+				AND a.rfid_no = #{rfidNo}
+			</if>
+			<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+				AND a.create_date BETWEEN #{startTime} AND #{endTime}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.create_date &gt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.create_date &lt;= #{endTime}
+			</if>
+			<if test="beginDealDate != null and beginDealDate != '' and endDealDate != null and endDealDate != ''">
+				AND a.deal_date BETWEEN #{beginDealDate} AND #{endDealDate}
+			</if>
+			<if test="beginDealDate != null and beginDealDate != ''">
+				AND a.deal_date &gt;= #{beginDealDate}
+			</if>
+			<if test="endDealDate != null and endDealDate != ''">
+				AND a.deal_date &lt;= #{endDealDate}
+			</if>
+			<if test="validFlag != null and validFlag != ''">
+				AND a.valid_flag = #{validFlag}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PassCheck" >
+		SELECT 
+			<include refid="passCheckColumns"/>
+		FROM pass_check a
+		<include refid="passCheckJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO pass_check(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			trnp_app_no,
+			user_code,
+			user_name,
+			vehicle_no,
+			trans_contact_person,
+			dept_code,
+			dep_name,
+			deal_person_no,
+			deal_person_name,
+			deal_date,
+			rfid_no,
+			pass_code,
+			archive_flag,
+			company_code,
+			company_cname,
+			type_code,
+			start_time,
+			end_time,
+			carry_company_name,
+			apply_time,
+			apply_person_no,
+			approve_time,
+			approve_person_no,
+			valid_flag,
+			feedback_flag,
+			feeback_content,
+			remark
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{trnpAppNo},
+			#{userCode},
+			#{userName},
+			#{vehicleNo},
+			#{transContactPerson},
+			#{deptCode},
+			#{depName},
+			#{dealPersonNo},
+			#{dealPersonName},
+			#{dealDate},
+			#{rfidNo},
+			#{passCode},
+			#{archiveFlag},
+			#{companyCode},
+			#{companyCname},
+			#{typeCode},
+			#{startTime},
+			#{endTime},
+			#{carryCompanyName},
+			#{applyTime},
+			#{applyPersonNo},
+			#{approveTime},
+			#{approvePersonNo},
+			#{validFlag},
+			#{feedbackFlag},
+			#{feebackContent},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE pass_check SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			trnp_app_no = #{trnpAppNo},
+			user_code = #{userCode},
+			user_name = #{userName},
+			vehicle_no = #{vehicleNo},
+			trans_contact_person = #{transContactPerson},
+			dept_code = #{deptCode},
+			dep_name = #{depName},
+			deal_person_no = #{dealPersonNo},
+			deal_person_name = #{dealPersonName},
+			deal_date = #{dealDate},
+			rfid_no = #{rfidNo},
+			pass_code = #{passCode},
+			archive_flag = #{archiveFlag},
+			company_code = #{companyCode},
+			company_cname = #{companyCname},
+			type_code = #{typeCode},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			carry_company_name = #{carryCompanyName},
+			apply_time = #{applyTime},
+			apply_person_no = #{applyPersonNo},
+			approve_time = #{approveTime},
+			approve_person_no = #{approvePersonNo},
+			valid_flag = #{validFlag},
+			feedback_flag = #{feedbackFlag},
+			feeback_content = #{feebackContent},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		update pass_check set del_flag='1'
+		WHERE trnp_app_no = #{trnpAppNo}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE pass_check SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="PassCheck" statementType="STATEMENT">
+		select * FROM pass_check  where ${propertyName} = '${value}'
+	</select>
+
+	<!--根据车牌号查询有效的出门条-->
+	<select id="findPassByVehicleNo" resultType="PassCheck">
+		SELECT
+		sdv.label typeName,
+		<include refid="passCheckColumns"/>
+		FROM
+		pass_check a
+		left join sys_dict_type sdt on sdt.type = 'pass_check_type'
+		left join sys_dict_value sdv on sdv.dict_type_id = sdt.id 	and a.type_code = sdv.value
+		WHERE
+  			 a.vehicle_no = #{vehicleNo}
+		and a.del_flag = '0'
+		and  a.valid_flag !='2'
+		and  now() BETWEEN a.start_time and a.end_time
+		order by a.create_date desc
+	</select>
+
+	<!--逻辑删除+出门条生效标记改为无效 -->
+	<update id="delByLogic">
+		UPDATE pass_check SET
+            valid_flag = #{validFlag},
+            update_date = now()
+		WHERE 	vehicle_no = #{vehicleNo}
+		and valid_flag != '1'
+	</update>
+
+
+	<insert id="insertPassCheckResult">
+		INSERT INTO weight_result(
+			id,
+			create_date,
+			success,
+			msg,
+			error_code,
+			type
+		) VALUES (
+			#{id},
+			#{createDate},
+			#{success},
+			#{msg},
+			#{errorCode},
+			#{type}
+		)
+	</insert>
+
+	<update id="updateDateType">
+		UPDATE pass_check p
+		SET p.data_type = #{dataType}
+		WHERE
+		p.trnp_app_no = #{trnpAppNo}
+	</update>
+
+
+    <update id="updateDeal">
+		UPDATE pass_check
+		SET
+		deal_person_no = #{dealPersonNo},
+        deal_person_name = #{dealPersonName},
+        deal_date = #{dealDate}
+		WHERE
+		id = #{id}
+	</update>
+<!--	出门条-->
+	<select id="getVehiclePassCheckList" resultType="PassCheck">
+		SELECT * FROM `pass_check` c where c.deal_date BETWEEN #{beginDealDate} AND #{endDealDate}
+		and pass_code in ('OUT-3,','OUT-6,')
+	</select>
+<!--	出门条未出厂-->
+	<select id="getVehiclePassCheckUList" resultType="Passcheck">
+		SELECT * FROM `pass_check` c where c.deal_date BETWEEN #{beginDealDate} AND #{endDealDate}
+		and valid_flag !='2';
+	</select>
+</mapper>

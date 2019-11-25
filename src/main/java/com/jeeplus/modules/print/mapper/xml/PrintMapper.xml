@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.print.mapper.PrintMapper">
+    
+	<sql id="printColumns">
+		a.id AS "id",
+		a.vehicleno AS "vehicleNo",
+		a.pronname AS "pronName",
+		a.suppliername AS "supplierName",
+		a.consigneuser AS "consigneUser",
+		a.matgrosswt AS "matGrossWt",
+		a.matwt AS "matWt",
+		a.impwt AS "impWt",
+		a.useip AS "UseIP",
+		a.weighno AS "weighNo",
+		a.string AS "String",
+		a.printnum AS "printNum",
+		a.printer AS "printer",
+		a.printtime AS "printTime"
+	</sql>
+	
+	<sql id="printJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="Print" >
+		SELECT 
+			<include refid="printColumns"/>
+		FROM test_print a
+		<include refid="printJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Print" >
+		SELECT 
+			<include refid="printColumns"/>
+		FROM test_print a
+		<include refid="printJoins"/>
+		<where>
+			
+			${dataScope}
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicleno = #{vehicleNo}
+			</if>
+			<if test="weighNo != null and weighNo != ''">
+				AND a.weighno = #{weighNo}
+			</if>
+			<if test="String != null and String != ''">
+				AND a.string = #{String}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Print" >
+		SELECT
+			DISTINCT
+			a.weigh_no AS "weighNo",
+			a.consign_id AS "consignId",
+			a.weight_type AS "weightType",
+			a.vehicle_no AS "vehicleNo",
+			a.prod_cname AS "prodCname",
+			a.print_time AS "printTime",
+			a.print_num AS "printNum",
+			a.taretime AS "taretime",
+			g.operation,s.name  AS "printer",
+            a.mat_gross_wt AS "matGrossWt",
+		    a.imp_wt AS "impWt",
+		    a.mat_wt AS "matWt",
+		    g.gate_num As "gateNum"
+			FROM weight a
+		    LEFT JOIN
+			GATE_LOG g
+			ON
+			a.weigh_no = g.weigh_no
+			LEFT JOIN
+			sys_user s
+			ON
+			s.id = a.printer
+			WHERE
+			g.operation = '打印磅单'
+			<if test="weighNo != null and weighNo!= ''">
+				AND a.weigh_no= #{weighNo}
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no= #{vehicleNo}
+			</if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO test_print(
+			id,
+			vehicleno,
+			pronname,
+			suppliername,
+			consigneuser,
+			matgrosswt,
+			matwt,
+			impwt,
+			useip,
+			weighno,
+			string,
+			printnum,
+			printer,
+			printtime
+		) VALUES (
+			#{id},
+			#{vehicleNo},
+			#{pronName},
+			#{supplierName},
+			#{consigneUser},
+			#{matGrossWt},
+			#{matWt},
+			#{impWt},
+			#{UseIP},
+			#{weighNo},
+			#{String},
+			#{printNum},
+			#{printer},
+			#{printTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE test_print SET 	
+			vehicleno = #{vehicleNo},
+			pronname = #{pronName},
+			suppliername = #{supplierName},
+			consigneuser = #{consigneUser},
+			matgrosswt = #{matGrossWt},
+			matwt = #{matWt},
+			impwt = #{impWt},
+			useip = #{UseIP},
+			weighno = #{weighNo},
+			string = #{String},
+			printnum = #{printNum},
+			printer = #{printer},
+			printtime = #{printTime}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM test_print
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE test_print SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Print" statementType="STATEMENT">
+		select * FROM test_print  where ${propertyName} = '${value}'
+	</select>
+
+	<!-- 查询磅单打印情况 -->
+	<select id="queryweight" resultType="Print" >
+			SELECT
+			DISTINCT
+			a.weigh_no AS "weighNo",
+			a.consign_id AS "consignId",
+			a.weight_type AS "weightType",
+			a.vehicle_no AS "vehicleNo",
+			a.prod_cname AS "prodCname",
+			a.print_time AS "printTime",
+			a.print_num AS "printNum",
+			a.taretime AS "taretime",
+			g.operation,s.name  AS "printer",
+            a.mat_gross_wt AS "matGrossWt",
+		    a.imp_wt AS "impWt",
+		    a.mat_wt AS "matWt",
+		    g.gate_num As "gateNum"
+			FROM weight a
+		    LEFT JOIN
+			GATE_LOG g
+			ON
+			a.weigh_no = g.weigh_no
+			LEFT JOIN
+			sys_user s
+			ON
+			s.id = a.printer
+			WHERE
+			g.operation = '打印磅单'
+	</select>
+	<!-- 查询票据打印情况 -->
+	<select id="querybill" resultType="Print" >
+			SELECT
+			DISTINCT
+			a.weigh_no AS "weighNo",
+			a.consign_id AS "consignId",
+			a.weight_type AS "weightType",
+			a.vehicle_no AS "vehicleNo",
+			a.prod_cname AS "prodCname",
+            a.mat_gross_wt AS "matGrossWt",
+		    a.imp_wt AS "impWt",
+		    a.mat_wt AS "matWt",
+		    g.gate_num As "gateNum"
+			FROM weight a
+		    LEFT JOIN
+			GATE_LOG g
+			ON
+			a.weigh_no = g.weigh_no
+			WHERE
+			g.operation = '打印票据'
+	</select>
+</mapper>

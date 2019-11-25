@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.controlqueue.mapper.ControlQueueMapper">
+
+	<sql id="controlQueueColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.station_id AS "stationId",
+		a.seat_num AS "seatNum",
+		a.state AS "state",
+		a.content AS "content",
+		a.weight_id AS "weightId",
+		a.remarks AS "remarks",
+		a.consign_id AS "consignId",
+		a.rfid_no AS "rfidNo",
+		a.vehicle_no AS "vehicleNo",
+		a.bill_pic AS "billPic"
+	</sql>
+	
+	<sql id="controlQueueJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="ControlQueue" >
+		SELECT 
+			<include refid="controlQueueColumns"/>
+		FROM control_queue a
+		<include refid="controlQueueJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ControlQueue" >
+		SELECT
+		ws.work_station stationName,
+		sdv.label stateName,
+			<include refid="controlQueueColumns"/>
+		FROM control_queue a
+		left join work_station ws on a.station_id = ws.id
+		left join sys_dict_type sdt on sdt.type = 'queue_state'
+		left join sys_dict_value sdv on sdv.dict_type_id = sdt.id
+		and a.state = sdv.value
+		<include refid="controlQueueJoins"/>
+
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			and a.state in (1,2)
+
+		</where>
+		<if test="seatNum != null and seatNum != ''">
+			and a.seat_num =#{seatNum}
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ControlQueue" >
+		SELECT 
+			<include refid="controlQueueColumns"/>
+		FROM control_queue a
+		<include refid="controlQueueJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO control_queue(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			station_id,
+			seat_num,
+			state,
+			content,
+			weight_id,
+			remarks,
+			consign_id,
+			rfid_no,
+			vehicle_no,
+			bill_pic
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{stationId},
+			#{seatNum},
+			#{state},
+			#{content},
+			#{weightId},
+			#{remarks},
+			#{consignId},
+			#{rfidNo},
+			#{vehicleNo},
+			#{billPic}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE control_queue SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			station_id = #{stationId},
+			seat_num = #{seatNum},
+			state = #{state},
+			content = #{content},
+			weight_id = #{weightId},
+			remarks = #{remarks},
+			consign_id=#{consignId},
+			rfid_no=#{rfidNo},
+			vehicle_no=#{vehicleNo},
+			bill_pic=#{billPic}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM control_queue
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE control_queue SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="ControlQueue" statementType="STATEMENT">
+		select * FROM control_queue  where ${propertyName} = '${value}'
+	</select>
+
+
+	<!--修改排队状态-->
+	<update id="updateState">
+		UPDATE control_queue SET
+			state = #{state}
+		WHERE id = #{id}
+	</update>
+
+	<!--打印磅单修改排队状态-->
+	<update id="updateStateByWeight">
+		UPDATE control_queue SET
+			state = #{state}
+		WHERE weight_id = #{weightId}
+	</update>
+
+	<!--判断当前坐席是否有正在处理的排队信息-->
+	<select id="checkSeatNum" resultType="ControlQueue">
+		select cq.id FROM control_queue cq  where cq.state = "2" and cq.seat_num = #{seatNum}
+	</select>
+
+	<!--查询排队人数-->
+	<select id="countQueue" resultType="ControlQueue">
+		select count(cq.id) queueNum FROM control_queue cq  where cq.state in (1,2) and cq.seat_num = #{seatNum}
+	</select>
+	<!--查询排队人数的所有坐席-->
+	<select id="countQueueAll" resultType="ControlQueue">
+		select count(cq.id) queueNum FROM control_queue cq  where cq.state in (1,2)
+	</select>
+	<!--查询排队请求最少的坐席-->
+	<select id="getMinSeatNum" resultType="ControlQueue">
+		SELECT
+			count(cq.id) queueNum,
+			cs.seat_num
+		FROM
+			control_seat cs
+		LEFT JOIN control_queue cq ON cs.seat_num = cq.seat_num and cq.state = '2'
+		where cs.seat_state = "1"
+		GROUP BY
+			cs.seat_num
+		ORDER BY
+			queueNum
+	</select>
+
+	<!--修改排队状态-->
+	<update id="updateStateByWeighId">
+		UPDATE control_queue SET
+			state = #{state}
+		WHERE
+		weight_id = #{weightId}
+	</update>
+
+	<!-- 通过磅单号查询排队信息-->
+	<select id="queryInfoByWeigh" resultType="ControlQueue">
+		SELECT
+		<include refid="controlQueueColumns"/>
+		FROM
+		control_queue a
+		where
+		a.weight_id = #{weightId}
+	</select>
+</mapper>

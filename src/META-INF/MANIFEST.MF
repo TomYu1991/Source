@@ -1,0 +1,68 @@
+Manifest-Version: 1.0
+Class-Path: aspectjrt-1.7.4.jar batik-anim-1.7.jar shiro-config-ogdl-1
+ .4.0-RC2.jar commons-collections-3.2.1.jar quartz-2.2.3.jar h2-1.3.17
+ 6.jar springfox-spi-2.5.0.jar commons-logging-1.2.jar swagger-annotat
+ ions-1.5.9.jar mysql-connector-java-5.1.35.jar javaGeom-0.11.1.jar my
+ batis-spring-1.2.2.jar mybatis-3.2.8.jar springfox-schema-2.5.0.jar s
+ pringfox-swagger-ui-2.5.0.jar activiti-common-rest-5.21.0.jar poi-oox
+ ml-3.9.jar commons-dbcp-1.4.jar activiti-process-validation-5.21.0.ja
+ r jackson-module-jaxb-annotations-2.8.6.jar batik-transcoder-1.7.jar 
+ sitemesh-2.4.2.jar mail-1.4.7.jar activation-1.1.1.jar jedis-2.9.0.ja
+ r spring-security-crypto-3.2.3.RELEASE.jar spring-context-4.3.5.RELEA
+ SE.jar activiti-spring-5.21.0.jar jstl-1.2.jar xstream-1.4.9.jar jcon
+ sole.jar xmlgraphics-commons-1.2.jar activiti-simple-workflow-5.21.0.
+ jar jline-2.14.2.jar slf4j-api-1.7.25.jar activiti-json-converter-5.2
+ 1.0.jar springfox-core-2.5.0.jar poi-ooxml-schemas-3.9.jar batik-awt-
+ util-1.7.jar spring-test-4.3.5.RELEASE.jar spring-messaging-4.3.5.REL
+ EASE.jar activiti-modeler-5.21.0.jar spring-expression-4.3.5.RELEASE.
+ jar spring-security-web-3.2.3.RELEASE.jar snappy-java-1.1.7.1.jar bat
+ ik-ext-1.7.jar druid-1.0.11.jar QRCode.jar jboss-logging-3.3.0.Final.
+ jar classmate-1.3.1.jar poi-3.9.jar jackson-databind-2.8.6.jar stax-a
+ pi-1.0.1.jar shiro-crypto-hash-1.4.0-RC2.jar javassist-3.21.0-GA.jar 
+ activiti-diagram-rest-5.21.0.jar jtds-1.3.1.jar xmlpull-1.1.3.1.jar c
+ ommons-io-2.4.jar ehcache-2.10.4.jar aopalliance-1.0.jar xmpcore-5.1.
+ 2.jar batik-util-1.7.jar httpcore-4.4.4.jar spring-aop-4.3.5.RELEASE.
+ jar commons-codec-1.9.jar hibernate-validator-5.4.0.Final.jar spring-
+ context-support-4.3.5.RELEASE.jar minlog-1.3.0.jar c3p0-0.9.1.1.jar f
+ st-2.57.jar batik-util-1.7.jar hamcrest-core-1.3.jar freemarker-2.3.2
+ 5-incubating.jar spring-oxm-4.3.5.RELEASE.jar springfox-swagger2-2.5.
+ 0.jar spring-plugin-core-1.2.0.RELEASE.jar spring-webmvc-4.3.5.RELEAS
+ E.jar mapstruct-1.0.0.Final.jar batik-svggen-1.7.jar batik-xml-1.7.ja
+ r spring-orm-4.3.5.RELEASE.jar batik-svg-dom-1.7.jar jsr250-api-1.0.j
+ ar metadata-extractor-2.6.2.jar spring-core-4.3.5.RELEASE.jar httpcli
+ ent-4.5.2.jar batik-codec-1.7.jar batik-gvt-1.7.jar core-2.2.jar bati
+ k-css-1.7.jar xercesImpl-2.8.1.jar commons-beanutils-1.9.1.jar batik-
+ dom-1.7.jar xmlbeans-2.3.0.jar activiti-engine-5.21.0.jar caffeine-2.
+ 6.1.jar log4j-1.2.17.jar postgresql-42.1.1.jar jgroups-3.6.13.Final.j
+ ar UserAgentUtils-1.20.jar gson-2.6.2.jar aspectjweaver-1.7.4.jar jav
+ ax.mail-1.5.0.jar commons-lang-2.5.jar org.jeeframework.gencode-2.0-t
+ omcat7.0.jar shiro-spring-1.4.0-RC2.jar springfox-spring-web-2.5.0.ja
+ r shiro-core-1.4.0-RC2.jar analyzer-2012_u6.jar activiti-explorer-5.2
+ 1.0.jar fastjson-1.2.45.jar kryo-shaded-3.0.0.jar shiro-ehcache-1.4.0
+ -RC2.jar spring-tx-4.3.5.RELEASE.jar ehcache-3.4.0.jar batik-bridge-1
+ .7.jar activiti-bpmn-model-5.21.0.jar spring-websocket-4.3.5.RELEASE.
+ jar slf4j-log4j12-1.7.25.jar shiro-event-1.4.0-RC2.jar imgscalr-lib-4
+ .2.jar jackson-core-2.8.6.jar json-lib-2.4-jdk15.jar xml-apis-ext-1.3
+ .04.jar objenesis-2.5.1.jar activiti-crystalball-5.21.0.jar xml-apis-
+ 1.3.04.jar junit-4.11.jar batik-js-1.7.jar shiro-lang-1.4.0-RC2.jar a
+ ctiviti-bpmn-layout-5.21.0.jar fop-0.94.jar commons-pool-1.5.4.jar ju
+ l-to-slf4j-1.7.25.jar quartz-jobs-2.2.3.jar spring-web-4.3.5.RELEASE.
+ jar validation-api-1.1.0.Final.jar jackson-annotations-2.8.6.jar shir
+ o-cas-1.4.0-RC2.jar joda-time-2.6.jar xpp3_min-1.1.4c.jar spring-plug
+ in-metadata-1.2.0.RELEASE.jar batik-script-1.7.jar jcl-over-slf4j-1.7
+ .25.jar ECharts-3.0.0.2.jar springfox-swagger-common-2.5.0.jar common
+ s-pool2-2.4.2.jar batik-parser-1.7.jar guava-20.0.jar ezmorph-1.0.6.j
+ ar cglib-3.1.jar javase-2.2.jar shiro-web-1.4.0-RC2.jar commons-fileu
+ pload-1.3.1.jar activiti-bpmn-converter-5.21.0.jar jgraphx-1.10.4.1.j
+ ar spring-security-config-3.2.3.RELEASE.jar commons-email-1.4.jar sta
+ ndard-1.1.2.jar activiti-image-generator-5.21.0.jar shiro-crypto-ciph
+ er-1.4.0-RC2.jar ojdbc14-10.2.0.3.0.jar groovy-all-2.4.5.jar tools.ja
+ r spring-beans-4.3.5.RELEASE.jar avalon-framework-api-4.3.1.jar sprin
+ g-security-core-3.2.3.RELEASE.jar dozer-5.5.1.jar commons-lang3-3.5.j
+ ar spring-jdbc-4.3.5.RELEASE.jar shiro-crypto-core-1.4.0-RC2.jar acti
+ viti-rest-5.21.0.jar shiro-cache-1.4.0-RC2.jar ehcache-core-2.6.11.ja
+ r asm-4.2.jar dom4j-1.6.1.jar shiro-config-core-1.4.0-RC2.jar swagger
+ -models-1.5.9.jar slf4j-simple-1.7.25.jar avalon-framework-impl-4.3.1
+ .jar cas-client-core-3.2.2.jar
+Main-Class: 
+

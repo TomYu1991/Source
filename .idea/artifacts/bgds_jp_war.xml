@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="bgds_jp:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>bgds_jp</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="jeeplus.war">
+      <element id="artifact" artifact-name="bgds_jp:war exploded" />
+    </root>
+  </artifact>
+</component>

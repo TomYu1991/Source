@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.weight.mapper.WeightMapper">
+
+	<sql id="weightColumns">
+		a.id AS "id",
+		a.consign_id AS "consignId",
+		a.weigh_no AS "weighNo",
+		a.weight_type AS "weightType",
+		a.seq_no AS "seqNo",
+		a.prod_code AS "prodCode",
+		a.prod_cname AS "prodCname",
+		a.sg_code AS "sgCode",
+		a.sg_sign AS "sgSign",
+		a.mat_spec_desc AS "matSpecDesc",
+		a.mat_wt AS "matWt",
+		a.weight_flag AS "weightFlag",
+		a.vehicle_no AS "vehicleNo",
+		a.ship_no AS "shipNo",
+		a.bill_no AS "billNo",
+		a.pono_lot_no AS "ponoLotNo",
+		a.blast_furnace_no AS "blastFurnaceNo",
+		a.ladle_no AS "ladleNo",
+		a.warehouseno AS "warehouseno",
+		a.tare_head_pic AS "tareHeadPic",
+		a.tare_tail_pic AS "tareTailPic",
+		a.tare_top_pic AS "tareTopPic",
+		a.gross_head_pic AS "grossHeadPic",
+		a.gross_tail_pic AS "grossTailPic",
+		a.gross_top_pic AS "grossTopPic",
+		a.dispatchtype AS "dispatchtype",
+		a.taretime AS "taretime",
+		a.grosstime AS "grosstime",
+		a.sub_no AS "subNo",
+		a.deal_person_no AS "dealPersonNo",
+		a.equip_num AS "equipNum",
+		a.customer_code AS "customerCode",
+		a.mat_num AS "matNum",
+		a.mat_gross_wt AS "matGrossWt",
+		a.imp_wt AS "impWt",
+		a.status AS "status",
+		a.consigne_user AS "consigneUser",
+		a.supplier_name AS "supplierName",
+		a.product_pack_wt AS "productPackWt",
+		a.default_flag AS "defaultFlag",
+		a.create_time AS "createTime",
+		a.updater AS "updater",
+		a.updatetime AS "updatetime",
+		a.remarks AS "remarks",
+		a.print_time AS "printTime",
+		a.data_type AS "dataType",
+		a.print_num AS "printNum",
+		a.printer AS "printer",
+		a.rfid_no AS "rfidNo",
+		a.abnr_type AS "abnrType",
+		a.fist_station AS "fistStation",
+		a.second_station AS "secondStation",
+		a.bill_pic AS "billPic",
+		a.affirm_flag AS "affirmFlag",
+		a.confirm_person_no AS "confirmPersonNo",
+		a.confirm_time AS "confirmTime",
+		a.field1 AS "field1"
+	</sql>
+	
+	<sql id="weightJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="Weight" >
+		SELECT 
+			<include refid="weightColumns"/>
+		FROM weight a
+		<include refid="weightJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Weight" >
+		SELECT 
+			<include refid="weightColumns"/>
+		FROM weight a
+		<include refid="weightJoins"/>
+		<where>
+			${dataScope}
+			<if test="consignId != null and consignId != ''">
+				AND a.consign_id like #{consignId}
+			</if>
+			<if test="weighNo != null and weighNo != ''">
+				AND a.weigh_no like #{weighNo}
+			</if>
+			<if test="weightType != null and weightType != ''">
+				AND a.weight_type = #{weightType}
+			</if>
+			<if test="weightFlag != null and weightFlag != ''">
+				AND a.weight_flag = #{weightFlag}
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no like #{vehicleNo}
+			</if>
+			<if test="prodCname != null and prodCname != ''">
+				AND a.prod_cname like #{prodCname}
+			</if>
+			<if test="dispatchtype != null and dispatchtype != ''">
+				AND a.dispatchtype = #{dispatchtype}
+			</if>
+			<if test="begintaretime != null and begintaretime != '' and endtaretime != null and endtaretime != ''">
+				AND a.taretime BETWEEN #{begintaretime} AND #{endtaretime}
+			</if>
+			<if test="begintaretime != null and begintaretime != ''">
+				AND a.taretime &gt;= #{begintaretime}
+			</if>
+			<if test="endtaretime != null and endtaretime != ''">
+				AND a.taretime &lt;= #{endtaretime}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="dataType == '0'.toString()">
+				AND a.data_type = '2' AND abnr_type != 5
+			</if>
+            <if test="dataType == '1'.toString()">
+                AND (a.data_type != '2' or a.data_type is NULL) AND abnr_type != 5
+			</if>
+			<if test="defaultFlag != null and defaultFlag != ''">
+				AND a.default_flag = #{defaultFlag}
+			</if>
+			<if test="consigneUser != null and consigneUser != ''">
+				AND a.consigne_user like #{consigneUser}
+			</if>
+			<if test="supplierName != null and supplierName != ''">
+				AND a.supplier_name like #{supplierName}
+			</if>
+			<if test="fistStation != null and fistStation != ''">
+				AND a.fist_station like #{fistStation}
+			</if>
+			<if test="secondStation != null and secondStation != ''">
+				AND a.second_station like #{secondStation}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Weight" >
+		SELECT 
+			<include refid="weightColumns"/>
+		FROM weight a
+		<include refid="weightJoins"/>
+		<where>
+			
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO weight(
+			id,
+			consign_id,
+			weigh_no,
+			weight_type,
+			seq_no,
+			prod_code,
+			prod_cname,
+			sg_code,
+			sg_sign,
+			mat_spec_desc,
+			mat_wt,
+			weight_flag,
+			vehicle_no,
+			ship_no,
+			bill_no,
+			pono_lot_no,
+			blast_furnace_no,
+			ladle_no,
+			warehouseno,
+			tare_head_pic,
+			tare_tail_pic,
+			tare_top_pic,
+			gross_head_pic,
+			gross_tail_pic,
+			gross_top_pic,
+			dispatchtype,
+			taretime,
+			grosstime,
+			sub_no,
+			deal_person_no,
+			equip_num,
+			customer_code,
+			mat_num,
+			mat_gross_wt,
+			imp_wt,
+			status,
+			consigne_user,
+			supplier_name,
+			product_pack_wt,
+			default_flag,
+			create_time,
+			updater,
+			updatetime,
+			remarks,
+			data_type,
+			rfid_no,
+			fist_station,
+		    second_station,
+		    abnr_type,
+		    bill_pic,
+		    affirm_flag,
+			confirm_person_no,
+			confirm_time,
+			field1
+		) VALUES (
+			#{id},
+			#{consignId},
+			#{weighNo},
+			#{weightType},
+			#{seqNo},
+			#{prodCode},
+			#{prodCname},
+			#{sgCode},
+			#{sgSign},
+			#{matSpecDesc},
+			#{matWt},
+			#{weightFlag},
+			#{vehicleNo},
+			#{shipNo},
+			#{billNo},
+			#{ponoLotNo},
+			#{blastFurnaceNo},
+			#{ladleNo},
+			#{warehouseno},
+			#{tareHeadPic},
+			#{tareTailPic},
+			#{tareTopPic},
+			#{grossHeadPic},
+			#{grossTailPic},
+			#{grossTopPic},
+			#{dispatchtype},
+			#{taretime},
+			#{grosstime},
+			#{subNo},
+			#{dealPersonNo},
+			#{equipNum},
+			#{customerCode},
+			#{matNum},
+			#{matGrossWt},
+			#{impWt},
+			#{status},
+			#{consigneUser},
+			#{supplierName},
+			#{productPackWt},
+			#{defaultFlag},
+			#{createTime},
+			#{updater},
+			#{updatetime},
+			#{remarks},
+			#{dataType},
+			#{rfidNo},
+			#{fistStation},
+		    #{secondStation},
+		    #{abnrType},
+		    #{billPic},
+		    #{affirmFlag},
+		    #{confirmPersonNo},
+		    #{confirmTime},
+		    #{field1}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weight SET 	
+			consign_id = #{consignId},
+			weigh_no = #{weighNo},
+			weight_type = #{weightType},
+			seq_no = #{seqNo},
+			prod_code = #{prodCode},
+			prod_cname = #{prodCname},
+			sg_code = #{sgCode},
+			sg_sign = #{sgSign},
+			mat_spec_desc = #{matSpecDesc},
+			mat_wt = #{matWt},
+			weight_flag = #{weightFlag},
+			vehicle_no = #{vehicleNo},
+			ship_no = #{shipNo},
+			bill_no = #{billNo},
+			pono_lot_no = #{ponoLotNo},
+			blast_furnace_no = #{blastFurnaceNo},
+			ladle_no = #{ladleNo},
+			warehouseno = #{warehouseno},
+			tare_head_pic = #{tareHeadPic},
+			tare_tail_pic = #{tareTailPic},
+			tare_top_pic = #{tareTopPic},
+			gross_head_pic = #{grossHeadPic},
+			gross_tail_pic = #{grossTailPic},
+			gross_top_pic = #{grossTopPic},
+			dispatchtype = #{dispatchtype},
+			taretime = #{taretime},
+			grosstime = #{grosstime},
+			sub_no = #{subNo},
+			deal_person_no = #{dealPersonNo},
+			equip_num = #{equipNum},
+			customer_code = #{customerCode},
+			mat_num = #{matNum},
+			mat_gross_wt = #{matGrossWt},
+			imp_wt = #{impWt},
+			status = #{status},
+			consigne_user = #{consigneUser},
+			supplier_name = #{supplierName},
+			product_pack_wt = #{productPackWt},
+			default_flag = #{defaultFlag},
+			create_time = #{createTime},
+			updater = #{updater},
+			updatetime = #{updatetime},
+			remarks = #{remarks},
+			data_type =#{dataType},
+			rfid_no=#{rfidNo},
+			fist_station=#{fistStation},
+		    second_station=#{secondStation},
+		    print_num=#{printNum},
+		     bill_pic=#{billPic},
+		    affirm_flag=#{affirmFlag},
+		   confirm_person_no= #{confirmPersonNo},
+			confirm_time=#{confirmTime},
+			field1=#{field1}
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE weight SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="cancel">
+		UPDATE weight SET
+			remarks = #{remarks},
+			status =  #{status},
+			updater = #{updater},
+		    updatetime = #{updatetime}
+		WHERE weigh_no = #{weighNo}
+	</update>
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Weight" statementType="STATEMENT">
+		select * FROM weight  where ${propertyName} = '${value}'
+	</select>
+
+	<!-- 跟据磅单号查询磅单信息 -->
+	<select id="queryInfoByWeighNo" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>
+		FROM
+		weight a
+		WHERE  a.weigh_no = #{weighNo}
+	</select>
+
+	<!-- 根据车牌查询该车辆最近一次称重信息 -->
+	<select id="queryInfoByVehicleNo" resultType="Weight" >
+			SELECT
+        <include refid="weightColumns"/>
+		FROM
+			weight a
+		WHERE
+			TO_DAYS(a.create_time) = TO_DAYS(NOW())
+            and a.status = '0'
+			and a.vehicle_no = #{vehicleNo}
+			ORDER BY a.create_time desc
+			limit 1
+	</select>
+
+	<!-- 根据车牌查询该车辆最近一次称重信息 -->
+	<select id="queryInfoByLadleNo" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>
+		FROM
+		weight a
+		left join consign c on c.consign_id = a.consign_id
+		WHERE
+		a.status = '0'
+		and a.vehicle_no = #{vehicleNo}
+		<if test="consignDept != null and consignDept != ''">
+			and c.consign_dept = #{consignDept}
+		</if>
+		ORDER BY a.create_time desc
+		limit 1
+	</select>
+
+    <!-- 根据委托单号称重信息 -->
+    <select id="queryInfoByConsignId" resultType="Weight" >
+			SELECT
+               <include refid="weightColumns"/>
+            FROM
+                weight a
+            WHERE
+                a.consign_id = #{consignId}
+			and a.status = 0
+		    and a.weight_flag='0'
+			order by a.create_time desc
+			limit 1
+	</select>
+
+	<!--过磅打印票据获取磅单相关信息-->
+	<select id="querydyWeight" resultType="Weight">
+        SELECT
+        imp_wt impWt,mat_gross_wt matGrossWt,mat_wt matWt,vehicle_no vehicleNo,consign_id consignId,print_num printNum,weigh_no weighNo
+        FROM
+        WEIGHT
+        WHERE
+        vehicle_no = #{vehicle_no}
+        and
+        consign_id = #{consign_id}
+    </select>
+
+	<!--添加磅单打印信息-->
+	<update id="updateWeightByweighNo">
+		update weight set printer = #{printer},print_num=#{printNum},print_time=#{printTime}
+		WHERE weigh_no = #{weighNo}
+	</update>
+
+	<!--通过磅单号和委托单号查询称重状态-->
+	<select id="queryByWeigh" resultType="Consign" >
+		SELECT
+		a.weight_state weightState
+		FROM consign a,weight w
+		WHERE  weigh_no = #{weighNo}
+		AND w.consign_id = a.consign_id
+	</select>
+	<!-- 查询空车还是重车 -->
+	<select id="queryVehicle" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>
+		FROM
+		weight a
+		WHERE
+		a.vehicle_no = #{vehicleNo}
+		and a.create_time > #{createTime}
+		limit 1
+	</select>
+
+	<!-- 跟据车牌号查询磅单信息 -->
+	<select id="queryInfoByVe" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>
+		FROM
+		weight a
+		WHERE  a.vehicle_no = #{vehicleNo}
+	</select>
+
+
+    <!--保存磅单异常信息-->
+    <update id="saveAbnrType">
+		update weight set abnr_type = #{abnrType}
+		WHERE weigh_no = #{weighNo}
+	</update>
+
+	<update id="updateDateType">
+		UPDATE weight w
+		SET w.data_type = #{dataType}
+		WHERE
+		w.weigh_no = #{weighNo}
+	</update>
+
+	<insert id="insertWeightResult">
+		INSERT INTO weight_result(
+			id,
+			create_date,
+			success,
+			msg,
+			error_code,
+			type
+		) VALUES (
+			#{id},
+			#{createDate},
+			#{success},
+			#{msg},
+			#{errorCode},
+			#{type}
+		)
+	</insert>
+
+	<!-- 根据ID修改状态 -->
+	<update id="updateweightFlag">
+		UPDATE weight SET
+        deal_person_no = #{dealPersonNo}
+		WHERE
+		1=1
+		<if test="consignId != null and consignId != ''">
+			AND consign_id = #{consignId}
+		</if>
+		<if test="weighNo != null and weighNo != ''">
+			AND weigh_no = #{weighNo}
+		</if>
+	</update>
+    <!-- 查询最近一次磅单的更新时间 -->
+	<select id="queryTime" resultType="Weight" >
+		SELECT
+			updatetime
+		FROM
+			weight
+		WHERE
+		<choose>
+			<when test="rfidNo !=null and rfidNo != null and rfidNo != ''">
+				<if test="rfidNo != null and rfidNo != ''">
+					rfid_no = #{rfidNo}
+				</if>
+			</when>
+			<otherwise>
+				vehicle_no = #{vehicleNo}
+			</otherwise>
+		</choose>
+		ORDER BY
+	    updatetime DESC
+	</select>
+
+	<!--根据委托单号查询磅单信息-->
+	<select id="queryByConsignId" resultType="Weight">
+		SELECT
+		<include refid="weightColumns"/>
+		FROM
+		weight a
+		WHERE a.consign_id = #{consignId}
+		AND a.status = 0
+	</select>
+
+	<!-- 保存一次图片 -->
+	<update id="saveTarePic">
+		UPDATE weight SET
+		    tare_head_pic = #{tareHeadPic},
+			tare_tail_pic = #{tareTailPic},
+			tare_top_pic = #{tareTopPic}
+		WHERE weigh_no = #{weighNo}
+	</update>
+	<!-- 保存二次图片 -->
+	<update id="saveGrossPic">
+		UPDATE weight SET
+		gross_head_pic = #{grossHeadPic},
+		gross_tail_pic = #{grossTailPic},
+		gross_top_pic = #{grossTopPic}
+		WHERE weigh_no = #{weighNo}
+	</update>
+	<!-- 保存票据图片 -->
+	<update id="saveBillPic">
+		UPDATE weight SET
+		bill_pic = #{billPic}
+		WHERE weigh_no = #{weighNo}
+	</update>
+
+    <select id="notSynchronized" resultType="Weight">
+        select
+        <include refid="weightColumns"/>
+        from
+        weight a
+        where
+        date_sub(curdate(),interval 1 day) &lt;= a.create_time
+		and a.data_type = '3'
+    </select>
+
+	<select id="showPrint" resultType="Print">
+        SELECT
+			a.weigh_no AS "weighNo",
+			a.print_num AS "printNum",
+			a.vehicle_no AS "vehicleNo",
+			g.operation AS "operation",
+			g.gate_num AS "gateNum",
+			g.date AS "printTime"
+		FROM
+			gate_log g
+		LEFT JOIN weight a ON g.weigh_no = a.weigh_no
+		WHERE
+			a.weigh_no = #{weigh_no}
+		ORDER BY g.create_date DESC
+	</select>
+
+
+	<!-- 根据磅单号修改磅单 -->
+	<update id="updateWeight">
+		UPDATE
+		weight SET
+		default_flag = #{defaultFlag},
+		mat_gross_wt = #{matGrossWt},
+		mat_wt = #{matWt},
+		imp_wt = #{impWt},
+		updater = #{updater},
+		updatetime = #{updatetime},
+		remarks = #{remarks}
+		WHERE
+		weigh_no = #{weighNo}
+	</update>
+
+	<!-- 根据委托单号查询磅单详情 -->
+	<select id="queryWeightByConsignId" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>
+		FROM weight a
+		WHERE a.consign_id = #{consignId}
+		AND a.default_flag = '1'
+		AND a.mat_wt is null
+		order by a.weigh_no desc
+	</select>
+
+	<!-- 跟据磅单号查询磅单信息：打印票据-->
+	<select id="printbill" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>,w.work_station workStation
+		FROM
+		weight a LEFT JOIN work_station w on a.fist_station = w.station_ip
+		WHERE  a.weigh_no = #{weighNo}
+	</select>
+
+	<!-- 跟据磅单号查询磅单信息:打印磅单 -->
+	<select id="printweight" resultType="Weight" >
+		SELECT
+		<include refid="weightColumns"/>,w.work_station workStation
+		FROM
+		weight a LEFT JOIN work_station w on a.second_station = w.station_ip
+		WHERE  a.weigh_no = #{weighNo}
+	</select>
+
+	<!-- 通过委托单查询未过磅的磅单 -->
+	<select id="queryUnWeight" resultType="Weight">
+        SELECT
+		<include refid="weightColumns"/>
+		FROM
+		weight a
+		WHERE
+		 a.weight_flag = '0'
+		and a.status = '0'
+		and a.abnr_type!='5'
+		<if test="consignId != null and consignId != ''">
+			and a.consign_id = #{consignId}
+		</if>
+		<if test="vehicleNo != null and vehicleNo != ''">
+			and a.vehicle_no = #{vehicleNo}
+		</if>
+		and (a.default_flag is null or a.default_flag != 1)
+    </select>
+
+
+</mapper>

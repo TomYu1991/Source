@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.swipecard.mapper.SwipeCardMapper">
+    
+	<sql id="swipeCardColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.ic_number AS "icnumber",
+		a.station_id AS "station.id",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.user_id AS "user.id",
+		a.job_number AS "jobNumber",
+		a.office_id AS "officeId",
+		a.id_card AS "idcard",
+		a.worker_id AS "workerId",
+		a.work_name AS "workName",
+        a.telephone AS "telephone"
+	</sql>
+	
+	<sql id="swipeCardJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="SwipeCard" >
+		SELECT 
+			<include refid="swipeCardColumns"/>
+		FROM swipe_card a
+		<include refid="swipeCardJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SwipeCard" >
+		SELECT 
+			<include refid="swipeCardColumns"/>
+		FROM swipe_card a
+		<include refid="swipeCardJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="icnumber != null and icnumber != ''">
+				AND a.ic_number like #{icnumber}
+			</if>
+			<if test="station != null and station.id != null and station.id != ''">
+				AND a.station_id = #{station.id}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.start_time = #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time = #{endTime}
+			</if>
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="jobNumber != null and jobNumber != ''">
+				AND a.job_number like #{jobNumber}
+			</if>
+			<if test="officeId != null and officeId != ''">
+				AND a.office_id like #{officeId}
+			</if>
+			<if test="workName != null and workName != ''">
+				AND a.work_name like #{workName}
+			</if>
+			<choose>
+				<when test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+					and a.start_time between #{startTime} and #{endTime}
+					and a.end_time between #{startTime} and #{endTime}
+				</when>
+				<otherwise>
+					<if test="startTime != null and startTime != ''">
+						AND a.start_time &gt;= #{startTime}
+					</if>
+					<if test="endTime != null and endTime != ''">
+						AND a.end_time &lt;= #{endTime}
+					</if>
+
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SwipeCard" >
+		SELECT 
+			<include refid="swipeCardColumns"/>
+		FROM swipe_card a
+		<include refid="swipeCardJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO swipe_card(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			ic_number,
+			station_id,
+			start_time,
+			end_time,
+			user_id,
+			job_number,
+			office_id,
+			id_card,
+			worker_id,
+			work_name,
+            telephone
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{icnumber},
+			#{station.id},
+			#{startTime},
+			#{endTime},
+			#{user.id},
+			#{jobNumber},
+			#{officeId},
+			#{idcard},
+			#{workerId},
+			#{workName},
+            #{telephone}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE swipe_card SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			ic_number = #{icnumber},
+			station_id = #{station.id},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			user_id = #{user.id},
+			job_number = #{jobNumber},
+			office_id = #{officeId},
+			id_card = #{idcard},
+			work_name = #{workName},
+            telephone = #{telephone}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM swipe_card
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE swipe_card SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="workerId !=null and workerId != ''">
+				WHERE worker_id = #{workerId}
+			</when>
+			<otherwise>
+				WHERE station_id = #{station.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="SwipeCard" statementType="STATEMENT">
+		select * FROM swipe_card  where ${propertyName} = '${value}'
+	</select>
+
+	<!--物理删除-->
+	<update id="deleteOne">
+		DELETE FROM swipe_card
+		  WHERE station_id = #{id}
+	</update>
+
+	<!-- 根据卡号查询权限管理表 -->
+	<select id="findByIcCard" resultType="SwipeCard">
+		SELECT
+		a.id AS "id",
+		a.id_card AS "idcard",
+		a.ic_number AS "icnumber",
+		a.work_name AS "workName",
+		a.job_number AS "jobNumber"
+	    FROM
+		swipe_card a
+		where
+		a.ic_number = #{ickh}
+	</select>
+
+	<!--接口方法-->
+	<insert id="insertSwipeCard">
+		INSERT INTO swipe_card(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			station_id,
+			start_time,
+			end_time,
+			user_id,
+			job_number,
+			office_id,
+			id_card,
+			worker_id,
+			work_name,
+            telephone
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{station.id},
+			#{startTime},
+			#{endTime},
+			#{user.id},
+			#{jobnumber},
+			#{officeId},
+			#{idcard},
+			#{workerId}
+			#{workName},
+            #{telephone}
+		)
+	</insert>
+
+	<!--物理删除-->
+	<update id="deleteSwipeCard">
+		DELETE FROM swipe_card
+		  WHERE id = #{id}
+	</update>
+
+	<!--绑定IC卡号-->
+	<update id="saveIC">
+        UPDATE swipe_card SET
+            ic_number = #{icnumber}
+		WHERE id = #{id}
+	</update>
+</mapper>

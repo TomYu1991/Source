@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.synchroinfo.mapper.DataSynchroInfoMapper">
+    
+	<sql id="dataSynchroInfoColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.name",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.name",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.consign_id AS "consignId",
+		a.pass_code AS "passCode",
+		a.vehicle_no AS "vehicleNo",
+		a.type AS "type",
+		a.remarks AS "remarks",
+		a.code AS "code",
+		a.operation_type AS "operationType",
+		a.status AS "status"
+	</sql>
+	
+	<sql id="dataSynchroInfoJoins">
+		
+	</sql>
+	
+    
+	<select id="get" resultType="DataSynchroInfo" >
+		SELECT 
+			<include refid="dataSynchroInfoColumns"/>
+		FROM synchro_info a
+		<include refid="dataSynchroInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="DataSynchroInfo" >
+		SELECT 
+			<include refid="dataSynchroInfoColumns"/>
+		FROM synchro_info a
+		<include refid="dataSynchroInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="biginCreateDate != null and biginCreateDate != '' and endCreateDate != null and endCreateDate != ''">
+				AND a.create_date BETWEEN #{biginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="biginCreateDate != null and biginCreateDate != ''">
+				AND a.create_date &gt;= #{biginCreateDate}
+			</if>
+			<if test="endCreateDate != null and endCreateDate != ''">
+				AND a.create_date &lt;= #{endCreateDate}
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code like #{code}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks like #{remarks}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="operationType != null and operationType != ''">
+				AND a.operation_type = #{operationType}
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no like #{vehicleNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DataSynchroInfo" >
+		SELECT 
+			<include refid="dataSynchroInfoColumns"/>
+		FROM synchro_info a
+		<include refid="dataSynchroInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO synchro_info(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			consign_id,
+			pass_code,
+			vehicle_no,
+			type,
+			remarks,
+			code,
+		    operation_type,
+		    status
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{consignId},
+			#{passCode},
+			#{vehicleNo},
+			#{type},
+			#{remarks},
+			#{code},
+		    #{operationType},
+		    #{status}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE synchro_info SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			consign_id = #{consignId},
+			pass_code = #{passCode},
+			vehicle_no = #{vehicleNo},
+			type = #{type},
+			remarks = #{remarks},
+			code AS #{code},
+		    operation_type AS #{operationType},
+		    status AS #{status}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM synchro_info
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE synchro_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="DataSynchroInfo" statementType="STATEMENT">
+		select * FROM synchro_info  where ${propertyName} = '${value}'
+	</select>
+
+	<insert id="saveRecord">
+		INSERT INTO synchro_info(
+			id,
+			create_by,
+			create_date,
+			update_date,
+			vehicle_no,
+			consign_id,
+			type,
+			remarks,
+			del_flag,
+			code,
+		    operation_type,
+		    status
+		) VALUES (
+			#{id},
+			#{createBy.name},
+			#{createDate},
+			#{updateDate},
+			#{vehicleNo},
+			#{consignId},
+			#{type},
+			#{remarks},
+			#{delFlag},
+			#{code},
+		    #{operationType},
+		    #{status}
+		)
+	</insert>
+
+</mapper>

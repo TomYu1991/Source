@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.weightrecord.mapper.InitWeightMapper">
+    
+	<sql id="initWeightColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.loginName",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.loginName",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.vehicle_no AS "vehicleNo",
+		a.ladle_no AS "ladleNo",
+		a.prod_cname AS "prodCname",
+		a.weight_time AS "weightTime",
+		a.weight_wt AS "weightWt",
+		a.default_flag AS "defaultFlag",
+		a.station_ip AS "stationIp",
+		a.remarks AS "remarks",
+		a.ponder_no AS "weight.weighNo"
+	</sql>
+	
+	<sql id="initWeightJoins">
+		
+			LEFT JOIN weight b ON b.id = a.ponder_no
+	</sql>
+	
+    
+	<select id="get" resultType="InitWeight" >
+		SELECT 
+			<include refid="initWeightColumns"/>
+		FROM init_weight a
+		<include refid="initWeightJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InitWeight" >
+		SELECT 
+			<include refid="initWeightColumns"/>
+		FROM init_weight a
+		<include refid="initWeightJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no = #{vehicleNo}
+			</if>
+			<if test="ladleNo != null and ladleNo != ''">
+				AND a.ladle_no = #{ladleNo}
+			</if>
+			<if test="prodCname != null and prodCname != ''">
+				AND a.prod_cname = #{prodCname}
+			</if>
+			<if test="beginWeightTime != null and endWeightTime != null ">
+				AND a.weight_time BETWEEN #{beginWeightTime} AND #{endWeightTime}
+			</if>
+			<if test="weightWt != null and weightWt != ''">
+				AND a.weight_wt = #{weightWt}
+			</if>
+			<if test="defaultFlag != null and defaultFlag != ''">
+				AND a.default_flag = #{defaultFlag}
+			</if>
+			<if test="stationIp != null and stationIp != ''">
+				AND a.station_ip = #{stationIp}
+			</if>
+			<if test="weight != null and weight.weighNo != null and weight.weighNo != ''">
+				AND a.ponder_no = #{weight.weighNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InitWeight" >
+		SELECT 
+			<include refid="initWeightColumns"/>
+		FROM init_weight a
+		<include refid="initWeightJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO init_weight(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			vehicle_no,
+			ladle_no,
+			prod_cname,
+			weight_time,
+			weight_wt,
+			default_flag,
+			station_ip,
+			remarks,
+			ponder_no
+		) VALUES (
+			#{id},
+			#{createBy.loginName},
+			#{createDate},
+			#{updateBy.loginName},
+			#{updateDate},
+			#{delFlag},
+			#{vehicleNo},
+			#{ladleNo},
+			#{prodCname},
+			#{weightTime},
+			#{weightWt},
+			#{defaultFlag},
+			#{stationIp},
+			#{remarks},
+			#{weight.weighNo}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE init_weight SET 	
+			update_by = #{updateBy.loginName},
+			update_date = #{updateDate},
+			vehicle_no = #{vehicleNo},
+			ladle_no = #{ladleNo},
+			prod_cname = #{prodCname},
+			weight_time = #{weightTime},
+			weight_wt = #{weightWt},
+			default_flag = #{defaultFlag},
+			station_ip = #{stationIp},
+			remarks = #{remarks},
+			ponder_no = #{weight.weighNo}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM init_weight
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE ponder_no = #{weight.weighNo}
+			</otherwise>
+		</choose>
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE init_weight SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE ponder_no = #{weight.weighNo}
+			</otherwise>
+		</choose>
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="InitWeight" statementType="STATEMENT">
+		select * FROM init_weight  where ${propertyName} = '${value}'
+	</select>
+	
+</mapper>

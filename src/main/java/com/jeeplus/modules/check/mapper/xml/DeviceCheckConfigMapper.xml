@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.check.mapper.DeviceCheckConfigMapper">
+    
+	<sql id="deviceCheckConfigColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.working_group AS "workingGroup",
+		a.working_area AS "workingArea",
+		a.group_leader as "groupLeader",
+		a.group_worker as "groupWorker",
+		a.check_cycle AS "checkCycle",
+		a.is_enable AS "isEnable",
+		a.check_date AS "checkDate"
+	</sql>
+	
+	<sql id="deviceCheckConfigJoins">
+-- 		left join device_check_citem b on a.id=b.config_id
+	</sql>
+	
+    
+	<select id="get" resultType="DeviceCheckConfig" >
+		SELECT 
+			<include refid="deviceCheckConfigColumns"/>
+		FROM device_check_config a
+		<include refid="deviceCheckConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<resultMap id="DeviceCheckConfigMap" type="DeviceCheckConfig">
+		<id column="id" property="id"/>
+		<result column="working_group" property="workingGroup"/>
+		<result column="group_leader" property="groupLeader"/>
+		<result column="group_worker" property="groupWorker"/>
+		<result column="working_area" property="workingArea"/>
+		<result column="check_cycle" property="checkCycle"/>
+		<result column="check_date" property="checkDate"/>
+		<result column="is_enable" property="isEnable"/>
+		<collection property="deviceCheckItemList" ofType="DeviceCheckItem">
+			<id column="id" property="id"/>
+			<result column="device_name" property="deviceName"/>
+			<result column="check_item" property="checkItem"/>
+			<result column="check_content" property="checkContent"/>
+			<result column="check_reference" property="checkReference"/>
+			<result column="check_method" property="checkMethod"/>
+		</collection>
+	</resultMap>
+	<select id="findConfigById" resultMap="DeviceCheckConfigMap">
+		select a.*,b.* from device_check_config a left join device_check_citem b
+		on a.id=b.config_id
+		where a.id=#{id}
+	</select>
+<!--	<resultMap id="findAllResultMap" type="com.jeeplus.modules.check.entity.deviceCheckConfig">-->
+<!--		<id column="id" property="id"/>-->
+<!--		<result column="working_group" property="workingGroup"/>-->
+<!--		<result column="working_area" property="workingArea"/>-->
+<!--		<result column="group_leader" property="groupLeader"/>-->
+<!--		<result column="group_worker" property="groupWorker"/>-->
+<!--		<result column="check_date" property="checkDate"/>-->
+<!--		<result column="check_cycle" property="checkCycle"/>-->
+<!--		<collection property="deviceCheckItemList" ofType="com.jeeplus.modules.check.entity.DeviceCheckItem">-->
+<!--			<id column="id" property="id"/>-->
+<!--			<result column="check_id" property="checkId"/>-->
+<!--			<result column="device_name" property="deviceName"/>-->
+<!--			<result column="check_item" property="checkItem"/>-->
+<!--			<result column="check_content" property="checkContent"/>-->
+<!--			<result column="check_reference" property="checkReference"/>-->
+<!--			<result column="check_result" property="checkResult"/>-->
+<!--		</collection>-->
+<!--	</resultMap>-->
+	<select id="findList" resultType="DeviceCheckConfig" >
+		SELECT 
+			<include refid="deviceCheckConfigColumns"/>
+
+		FROM device_check_config a
+		<include refid="deviceCheckConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="workingGroup != null and workingGroup != ''">
+				AND a.working_group like #{workingGroup}
+			</if>
+			<if test="workingArea != null and workingArea != ''">
+				AND a.working_area like #{workingArea}
+			</if>
+			<if test="checkCycle != null and checkCycle != ''">
+				AND a.check_cycle = #{checkCycle}
+			</if>
+			<if test="isEnable != null and isEnable != ''">
+				AND a.is_enable = #{isEnable}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DeviceCheckConfig" >
+		SELECT 
+			<include refid="deviceCheckConfigColumns"/>
+		FROM device_check_config a
+		<include refid="deviceCheckConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO device_check_config(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			working_group,
+			working_area,
+			group_leader,
+			group_worker,
+			check_cycle,
+			check_date,
+			is_enable
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{workingGroup},
+			#{workingArea},
+			#{groupLeader},
+			#{groupWorker},
+			#{checkCycle},
+			#{checkDate},
+			#{isEnable}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE device_check_config SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			working_group = #{workingGroup},
+			working_area = #{workingArea},
+			group_leader = #{groupLeader},
+	 		group_worker = #{groupWorker},
+			check_cycle = #{checkCycle},
+	    	check_date = #{checkDate},
+	     	is_enable = #{isEnable}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM device_check_config
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE device_check_config SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+<!--	&lt;!&ndash; 根据实体名称和字段名称和字段值获取唯一记录 &ndash;&gt;-->
+<!--	<select id="findUniqueByProperty" resultType="deviceCheckConfig" statementType="STATEMENT">-->
+<!--		select * FROM device_check_config  where ${propertyName} = '${value}'-->
+<!--	</select>-->
+
+<!--	<select id="findInfoByCard" resultType="deviceCheckConfig">-->
+<!--		SELECT-->
+<!--		p.personnel_id personnelId,-->
+<!--		p.name,-->
+<!--		p.sex,-->
+<!--		p.dept_name deptName FROM user_pass_info p-->
+<!--		WHERE-->
+<!--		p.card_serial = #{cardSerial}-->
+<!--	</select>-->
+
+<!--	<insert id="saveUserPassInfo">-->
+<!--		INSERT INTO user_pass_info(-->
+<!--			id,-->
+<!--			personnel_id,-->
+<!--			name,-->
+<!--			sex,-->
+<!--			card_serial,-->
+<!--			dept_name-->
+<!--		) VALUES (-->
+<!--			#{id},-->
+<!--			#{personnelId},-->
+<!--			#{name},-->
+<!--			#{sex},-->
+<!--			#{cardSerial},-->
+<!--			#{deptName}-->
+<!--		)-->
+<!--	</insert>-->
+
+
+
+</mapper>

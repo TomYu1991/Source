@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.videos.mapper.VideosMapper">
+
+	<sql id="videosColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.camera_name AS "cameraName",
+		a.camera_ip AS "cameraIp",
+		a.camera_port AS "cameraPort",
+		a.resolution AS "resolution",
+		a.frames AS "frames",
+		a.camera_type AS "cameraType",
+		a.device_station AS "station.id",
+		a.username AS "username",
+		a.password AS "password",
+		a.camera_order AS "cameraOrder",
+		a.is_normal AS "isNormal",
+		a.video_group AS "videoGroup",
+		a.video_camera AS "videoCamera",
+		a.video_mode AS "videoMode",
+		a.input_date AS "inputDate",
+		a.inputer AS "inputer",
+		a.camera_no AS "cameraNo",
+		a.flag AS "flag",
+		a.order_flag AS "orderFlag",
+		a.institution AS "institution",
+		station.work_station AS "station.workStation"
+	</sql>
+
+	<sql id="videosJoins">
+		LEFT JOIN work_station station ON station.id = a.device_station
+	</sql>
+
+
+	<select id="get" resultType="Videos" >
+		SELECT
+		<include refid="videosColumns"/>
+		FROM videos a
+		<include refid="videosJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Videos" >
+		SELECT
+		<include refid="videosColumns"/>
+		FROM videos a
+		<include refid="videosJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+			<if test="cameraName != null and cameraName != ''">
+				AND a.camera_name = #{cameraName}
+			</if>
+			<if test="cameraType != null and cameraType != ''">
+				AND a.camera_type = #{cameraType}
+			</if>
+			<if test="station != null and station.id != null and station.id != ''">
+				AND a.device_station = #{station.id}
+			</if>
+			<if test="inputDate != null and inputDate != ''">
+				AND a.input_date = #{inputDate}
+			</if>
+			<if test="inputer != null and inputer != ''">
+				AND a.inputer = #{inputer}
+			</if>
+			<if test="station != null and station.workStation != null and station.workStation != ''">
+				AND station.work_station = #{station.workStation}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="Videos" >
+		SELECT
+		<include refid="videosColumns"/>
+		FROM videos a
+		<include refid="videosJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO videos(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			camera_name,
+			camera_ip,
+			camera_port,
+			resolution,
+			frames,
+			camera_type,
+			device_station,
+			username,
+			password,
+			camera_order,
+			is_normal,
+			video_group,
+			video_camera,
+			video_mode,
+			input_date,
+			inputer,
+			camera_no,
+			flag,
+			order_flag,
+			institution
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{cameraName},
+			#{cameraIp},
+			#{cameraPort},
+			#{resolution},
+			#{frames},
+			#{cameraType},
+			#{station.id},
+			#{username},
+			#{password},
+			#{cameraOrder},
+			#{isNormal},
+			#{videoGroup},
+			#{videoCamera},
+			#{videoMode},
+			#{inputDate},
+			#{inputer},
+			#{cameraNo},
+			#{flag},
+			#{orderFlag},
+			#{institution}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE videos SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			camera_name = #{cameraName},
+			camera_ip = #{cameraIp},
+			camera_port = #{cameraPort},
+			resolution = #{resolution},
+			frames = #{frames},
+			camera_type = #{cameraType},
+			device_station = #{station.id},
+			username = #{username},
+			password = #{password},
+			camera_order = #{cameraOrder},
+			is_normal = #{isNormal},
+			video_group = #{videoGroup},
+			video_camera = #{videoCamera},
+			video_mode = #{videoMode},
+			input_date = #{inputDate},
+			inputer = #{inputer},
+			camera_no = #{cameraNo},
+			flag = #{flag},
+			order_flag = #{orderFlag},
+			institution = #{institution}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM videos
+		WHERE id = #{id}
+	</update>
+
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE videos SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="Videos" statementType="STATEMENT">
+		select * FROM videos  where ${propertyName} = '${value}'
+	</select>
+	<!--通过工作站id查询视频信息-->
+	<select id="getVediosByDbid" resultType="Videos" >
+		SELECT
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.camera_name AS "cameraName",
+		a.camera_ip AS "cameraIp",
+		a.camera_port AS "cameraPort",
+		a.resolution AS "resolution",
+		a.frames AS "frames",
+		a.camera_type AS "cameraType",
+		a.device_station AS "station.id",
+		a.username AS "username",
+		a.password AS "password",
+		a.camera_order AS "cameraOrder",
+		a.is_normal AS "isNormal",
+		a.video_group AS "videoGroup",
+		a.video_camera AS "videoCamera",
+		a.video_mode AS "videoMode",
+		a.input_date AS "inputDate",
+		a.inputer AS "inputer",
+		a.camera_no AS "cameraNo",
+		a.flag AS "flag",
+		a.order_flag AS "orderFlag",
+		a.institution AS "institution",
+		w.station_ip AS stationIp
+		FROM
+		videos a,work_station w
+		WHERE
+		a.device_station = w.id
+		AND
+		w.id = #{dbid}
+		order by a.camera_order
+	</select>
+
+	<!--通过单位名称查询机构编码-->
+	<select id="getCodeByName" resultType="Videos" >
+		SELECT
+		code
+		FROM
+		sys_office
+		WHERE
+		name = #{institution}
+	</select>
+
+	<!-- 通过采集仪IP查询通道号 -->
+	<select id="queryVideoCamera" resultType="Videos" >
+         select
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.camera_name AS "cameraName",
+		a.camera_ip AS "cameraIp",
+		a.camera_port AS "cameraPort",
+		a.resolution AS "resolution",
+		a.frames AS "frames",
+		a.camera_type AS "cameraType",
+		a.device_station AS "station.id",
+		a.username AS "username",
+		a.password AS "password",
+		a.camera_order AS "cameraOrder",
+		a.is_normal AS "isNormal",
+		a.video_group AS "videoGroup",
+		a.video_camera AS "videoCamera",
+		a.video_mode AS "videoMode",
+		a.input_date AS "inputDate",
+		a.inputer AS "inputer",
+		a.camera_no AS "cameraNo",
+		a.flag AS "flag",
+		a.order_flag AS "orderFlag",
+		a.institution AS "institution",
+		w.station_ip AS stationIp
+		from
+		videos a,work_station w
+		where
+		a.device_station = w.id
+	    and a.camera_no !=''
+		and w.station_ip = #{stationIp}
+		order by a.camera_order
+	</select>
+</mapper>

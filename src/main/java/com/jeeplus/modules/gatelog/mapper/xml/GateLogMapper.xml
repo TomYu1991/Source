@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.gatelog.mapper.GateLogMapper">
+    
+	<sql id="gateLogColumns">
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.operation AS "operation",
+		a.office_id AS "officeId",
+		a.company_id AS "companyId",
+		a.gate_num AS "gateNum",
+		a.device_num AS "deviceNum",
+		a.consign_id AS "consignId",
+		a.pass_code AS "passCode",
+		a.vehicle_no AS "vehicleNo",
+		a.date AS "date",
+		a.user_ip AS "userIP",
+		a.exception AS "exception",
+		a.remarks AS "remarks",
+		a.data_type AS "dataType",
+		u.name AS "u.name",
+		a.weigh_no AS "weighNo",
+		a.seat_num AS "seatNum",
+		a.work_name AS "workName",
+		a.ic_number AS "icNumber"
+	</sql>
+	
+	<sql id="gateLogJoins">
+		LEFT JOIN sys_user u ON u.id = a.user_id
+	</sql>
+	
+    
+	<select id="get" resultType="GateLog" >
+		SELECT 
+			<include refid="gateLogColumns"/>
+		FROM gate_log a
+		<include refid="gateLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="GateLog" >
+		SELECT 
+			<include refid="gateLogColumns"/>
+		FROM gate_log a
+		<include refid="gateLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+            <if test="workName != null and workName != ''">
+                AND a.work_name like #{workName}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND a.remarks like #{remarks}
+            </if>
+			<if test="operation != null and operation != ''">
+				AND a.operation = #{operation}
+			</if>
+			<if test="gateNum != null and gateNum != ''">
+				AND a.gate_num = #{gateNum}
+			</if>
+			<if test="deviceNum != null and deviceNum != ''">
+				AND a.device_num = #{deviceNum}
+			</if>
+			<if test="consignId != null and consignId != ''">
+				AND a.consign_id = #{consignId}
+			</if>
+			<if test="passCode != null and passCode != ''">
+				AND a.pass_code = #{passCode}
+			</if>
+			<if test="vehicleNo != null and vehicleNo != ''">
+				AND a.vehicle_no like #{vehicleNo}
+			</if>
+			<if test="dataType != null and dataType != ''">
+				AND a.data_type = #{dataType}
+			</if>
+			<if test="beginDate != null and endDate != null and beginDate != '' and endDate != '' ">
+				AND a.date BETWEEN #{beginDate} AND #{endDate}
+			</if>
+			<if test="beginDate != null and endDate == null ">
+				AND a.date >= #{beginDate}
+			</if>
+			<if test="endDate != null and beginDate == null ">
+				AND #{endDate} >= a.date
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="GateLog" >
+		SELECT 
+			<include refid="gateLogColumns"/>
+		FROM gate_log a
+		<include refid="gateLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			${dataScope}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO gate_log(
+			id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			operation,
+			user_id,
+			office_id,
+			company_id,
+			gate_num,
+			device_num,
+			consign_id,
+			pass_code,
+			vehicle_no,
+			date,
+			user_ip,
+			exception,
+			remarks,
+			data_type,
+			weigh_no,
+			seat_num,
+			work_name,
+		    ic_number
+		) VALUES (
+			#{id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{operation},
+			#{createBy.id},
+			#{officeId},
+			#{companyId},
+			#{gateNum},
+			#{deviceNum},
+			#{consignId},
+			#{passCode},
+			#{vehicleNo},
+			now(),
+			#{userIP},
+			#{exception},
+			#{remarks},
+			#{dataType},
+			#{weighNo},
+			#{seatNum},
+			#{workName},
+		    #{icNumber}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE gate_log SET 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			operation = #{operation},
+			user_id = #{u.id},
+			office_id = #{officeId},
+			company_id = #{companyId},
+			gate_num = #{gateNum},
+			device_num = #{deviceNum},
+			consign_id = #{consignId},
+			pass_code = #{passCode},
+			vehicle_no = #{vehicleNo},
+			date = #{date},
+			user_ip = #{userIP},
+			exception = #{exception},
+			remarks = #{remarks},
+			data_type = #{dataType},
+			weigh_no =#{weighNo},
+			seat_num=#{seatNum},
+			work_name = #{workName},
+		    ic_number = #{icNumber}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM gate_log
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE gate_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!--计算排队车辆-->
+	<select id="countCarByVehicleNo" resultType="GateLog" >
+
+
+	</select>
+
+	<!--查询岗亭到地磅之间最大排队数量-->
+	<select id="queryMaxCarNum" resultType="GateLog" >
+		SELECT
+			v.value num
+		FROM
+			sys_dict_type t
+		LEFT JOIN sys_dict_value v ON t.id = v.dict_type_id
+		WHERE
+			t.type = 'vehicle_num'
+
+	</select>
+
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="GateLog" statementType="STATEMENT">
+		select * FROM gate_log  where ${propertyName} = '${value}'
+	</select>
+
+	<!-- 查询门岗日志表里是否有已经打印过的磅单-->
+	<select id="queryGateLogbd" resultType="GateLog" >
+		SELECT
+		a.id AS "id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.operation AS "operation",
+		a.user_id AS "u.id",
+		a.office_id AS "officeId",
+		a.company_id AS "companyId",
+		a.gate_num AS "gateNum",
+		a.device_num AS "deviceNum",
+		a.consign_id AS "consignId",
+		a.pass_code AS "passCode",
+		a.vehicle_no AS "vehicleNo",
+		a.date AS "date",
+		a.user_ip AS "userIP",
+		a.exception AS "exception",
+		a.remarks AS "remarks",
+		a.data_type AS "dataType",
+		a.weigh_no AS "weighNo",
+		a.seat_num AS "seatNum",
+		 w.print_num printNum
+		FROM
+		GATE_LOG a,weight w
+		WHERE
+		a.weigh_no = w.weigh_no and
+		a.weigh_no = #{weighNo}
+		and
+		a.operation = '打印磅单'
+    </select>
+</mapper>
